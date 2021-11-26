@@ -21,7 +21,7 @@ LOGGER.addHandler(consoleHandler)
 class Database:
 
     def __init__(self, **kwargs):
-        self.connect(**kwargs)
+        pass
 
     def connect(self, **kwargs):
         with open('config.yaml', 'r') as file:
@@ -103,20 +103,18 @@ class Database:
 
     @connectionpersistence
     def insert_bought_items(self, user: str, items: dict, date: str = None):
-        temp = ["user, item, amount", "%(user)s, %(item)s, %(amount)s", "bought.user = %(user)s AND bought.item = %(item)s AND bought.date = "]
-        temp[2] += "%(date)s" if date else "NOW()"
+        temp = ["user, item, amount", "%(user)s, %(item)s, %(amount)s",
+                "bought.user = %(user)s AND bought.item = %(item)s AND bought.date = " + ("%(date)s" if date else "NOW()")]
         if date:
             temp[0] += ", date"
             temp[1] += ", %(date)s"
+            values = [{'user': user, 'item': key, 'amount': value, 'date': date} for key, value in items.items()]
+        else:
+            values = [{'user': user, 'item': key, 'amount': value} for key, value in items.items()]
         query = f"INSERT INTO bought({temp[0]}) VALUES({temp[1]}) ON CONFLICT ON CONSTRAINT bought_user_item_buy_date DO UPDATE SET amount = bought.amount + %(amount)s WHERE {temp[2]};"
         with self.conn.cursor() as cursor:
             try:
-                if date:
-                    cursor.executemany(query, [
-                                   {'user': user, 'item': key, 'amount': value, 'date': date} for key, value in items.items()])
-                else:
-                    cursor.executemany(query, [
-                                   {'user': user, 'item': key, 'amount': value} for key, value in items.items()])
+                cursor.executemany(query, values)
                 self.conn.commit()
                 return True
             except Exception as e:
