@@ -51,17 +51,9 @@ def insert():
         case _:
             abort(400)
 
-
-@app.route('/scan2kasse/<int:year>/<int:month>', methods=['GET'])
-def get_monthly_report(year: int, month: int):
-    return get_monthly_report_from_user(year=year, month=month)
-
-
 @app.route('/scan2kasse/<string:user>', methods=['GET'])
-def get_report_from_user(user: str):
-    return get_monthly_report_from_user(user=user)
-
-
+@app.route('/scan2kasse/<int:year>/<int:month>', methods=['GET'])
+@app.route('/scan2kasse/<string:user>/<int:year>', methods=['GET'])
 @app.route('/scan2kasse/<string:user>/<int:year>/<int:month>', methods=['GET'])
 def get_monthly_report_from_user(user: str = None, year: int = None, month: int = None):
     if month and (month > 12 or month < 1):
