@@ -1,7 +1,7 @@
-from datetime import date
+from database import Database
 from flask import Flask, abort, request
 from flask.json import jsonify
-from database import Database
+from gevent.pywsgi import WSGIServer
 import logging
 
 
@@ -83,4 +83,5 @@ def group_results(results: tuple) -> dict:
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    http_server = WSGIServer(('', 5000), app)
+    http_server.serve_forever()
