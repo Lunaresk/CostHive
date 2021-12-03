@@ -1,0 +1,28 @@
+name: Create Release
+on: 
+  push:
+    tags:
+    - '*'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Archive Server
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        path: "server"
+        filename: 'server.zip'
+    - name: Archive Client
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'zip'
+        path: "client"
+        filename: 'client.zip'
+    - name: Release Archive
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        artifacts: "server.zip,client.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
