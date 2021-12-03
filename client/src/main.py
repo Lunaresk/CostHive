@@ -72,7 +72,7 @@ def scanning() -> list:
                     try:
                         scanned.remove(scan)
                     except ValueError as e:
-                        pass
+                        LOGGER.exception(e)
             case _:
                 scanned.append(scan)
     return scanned

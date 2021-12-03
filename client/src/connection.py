@@ -42,4 +42,4 @@ def send_scan(login: str, scanned: dict[int: int], date:str = None):
         return True if response.status_code == 201 else response.json
     except Exception as e:
         LOGGER.exception(e)
-        return False
+        return infos
