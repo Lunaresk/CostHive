@@ -39,6 +39,7 @@ def send_scan(login: str, scanned: dict[int: int], date:str = None):
     try:
         response = put(url=":".join([SERVER, str(
             PORT)]) + '/scan2kasse/insert', json=infos)
-        return True if response.status_code == 201 else False
-    except:
+        return True if response.status_code == 201 else response.json
+    except Exception as e:
+        LOGGER.exception(e)
         return False

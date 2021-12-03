@@ -1,4 +1,4 @@
-from psycopg2 import connect as psyconn, ProgrammingError
+from psycopg2 import connect as psyconn, ProgrammingError, errors
 from yaml import safe_load
 import logging
 
@@ -33,6 +33,7 @@ class Database:
         LOGGER.info('Connecting to Database.')
         self.conn = psyconn(host=kwargs["host"], port=kwargs["port"], dbname=kwargs["database"],
                             user=kwargs["user"], password=kwargs["password"])
+        self.conn.autocommit = True
 
     def test_connection(self):
         if not hasattr(self, "conn"):
@@ -72,23 +73,23 @@ class Database:
 
     @connectionpersistence
     def get_report(self, **kwargs) -> list:
-        query = "SELECT u.name, bp.buy_date, i.name, bp.amount, bp.buy_price FROM bought_with_prices bp INNER JOIN items i ON bp.item = i.id INNER JOIN users u ON bp.user = u.login"
+        query = "SELECT u.name, bp.date, i.name, bp.amount, bp.price FROM bought_with_prices bp INNER JOIN items i ON bp.item = i.id INNER JOIN users u ON bp.user = u.login"
         if kwargs:
             query += " WHERE "
             tempquery = []
             if "user" in kwargs and kwargs['user']:
                 tempquery.append(f"bp.user = '{kwargs['user']}'")
             if "year" in kwargs and kwargs['year']:
-                tempstring = ""
+                tempstring = "bp.date BETWEEN "
                 if "month" in kwargs and kwargs['month']:
-                    tempstring += f"bp.buy_date BETWEEN '{kwargs['year']}-{kwargs['month']}-01' AND "
+                    tempstring += f"'{kwargs['year']}-{kwargs['month']}-01' AND "
                     tempstring += f"'{kwargs['year']+1}-01-01'" if kwargs['month'] == 12 else f"'{kwargs['year']}-{kwargs['month']+1}-01'"
                 else:
-                    tempstring += f"bp.buy_date BETWEEN '{kwargs['year']}-01-01' AND '{kwargs['year']+1}-01-01'"
+                    tempstring += f"'{kwargs['year']}-01-01' AND '{kwargs['year']+1}-01-01'"
                 tempstring += "::date - INTERVAL '1' DAY"
                 tempquery.append(tempstring)
             query += " AND ".join(tempquery)
-        query += " ORDER BY u.name, bp.buy_date, i.name ASC;"
+        query += " ORDER BY u.name, bp.date, i.name ASC;"
         LOGGER.debug(f"Executing query: {query}")
         result = []
         with self.conn.cursor() as cursor:
@@ -103,23 +104,29 @@ class Database:
 
     @connectionpersistence
     def insert_bought_items(self, user: str, items: dict, date: str = None):
-        temp = ["user, item, amount", "%(user)s, %(item)s, %(amount)s",
+        temp = ['"user", item, amount', "%(user)s, %(item)s, %(amount)s",
                 "bought.user = %(user)s AND bought.item = %(item)s AND bought.date = " + ("%(date)s" if date else "NOW()")]
         if date:
             temp[0] += ", date"
             temp[1] += ", %(date)s"
-            values = [{'user': user, 'item': key, 'amount': value, 'date': date} for key, value in items.items()]
+            values = [{'user': user, 'item': int(key), 'amount': value, 'date': date} for key, value in items.items()]
         else:
-            values = [{'user': user, 'item': key, 'amount': value} for key, value in items.items()]
-        query = f"INSERT INTO bought({temp[0]}) VALUES({temp[1]}) ON CONFLICT ON CONSTRAINT bought_user_item_buy_date DO UPDATE SET amount = bought.amount + %(amount)s WHERE {temp[2]};"
+            values = [{'user': user, 'item': int(key), 'amount': value} for key, value in items.items()]
+        query = f"INSERT INTO bought({temp[0]}) VALUES({temp[1]}) ON CONFLICT ON CONSTRAINT bought_user_item_date DO UPDATE SET amount = bought.amount + %(amount)s WHERE {temp[2]};"
         with self.conn.cursor() as cursor:
-            try:
-                cursor.executemany(query, values)
-                self.conn.commit()
-                return True
-            except Exception as e:
-                LOGGER.debug(e)
-                return False
+            failed = {}
+            for value in values:
+                try:
+                    cursor.execute(query, value)
+                except errors.ForeignKeyViolation as e:
+                    if failed:
+                        failed['items'][value['item']] = value['amount']
+                    else:
+                        failed = dict(value)
+                    LOGGER.exception(e)
+                except Exception as e:
+                    LOGGER.exception(e)
+        return failed
 
     def __delete__(self):
         self.conn.close()

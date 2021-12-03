@@ -41,13 +41,15 @@ def login():
 def insert():
     match request.json:
         case {'login': login, 'items': items, 'date': date}:
-            if DATABASE.insert_bought_items(login, items, date):
-                return jsonify({'insert': True}), 201
-            return jsonify({'insert': False}), 400
+            failed = DATABASE.insert_bought_items(login, items, date)
+            if failed:
+                return jsonify(failed), 400
+            return jsonify({'inserted': True}), 201
         case {'login': login, 'items': items}:
-            if DATABASE.insert_bought_items(login, items):
-                return jsonify({'insert': True}), 201
-            return jsonify({'insert': False}), 400
+            failed = DATABASE.insert_bought_items(login, items)
+            if failed:
+                return jsonify(failed), 400
+            return jsonify({'inserted': True}), 201
         case _:
             abort(400)
 
