@@ -105,7 +105,7 @@ class Database:
     @connectionpersistence
     def insert_bought_items(self, user: str, items: dict, date: str = None):
         temp = ['"user", item, amount', "%(user)s, %(item)s, %(amount)s",
-                "bought.user = %(user)s AND bought.item = %(item)s AND bought.date = " + ("%(date)s" if date else "NOW()")]
+                "bought.user = %(user)s AND bought.item = %(item)s AND bought.date = " + ("%(date)s" if date else "NOW()::date")]
         if date:
             temp[0] += ", date"
             temp[1] += ", %(date)s"
