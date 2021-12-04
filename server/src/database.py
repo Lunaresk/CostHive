@@ -122,7 +122,9 @@ class Database:
                     if failed:
                         failed['items'][value['item']] = value['amount']
                     else:
-                        failed = dict(value)
+                        failed = {'user': user, 'items': {value['item']: value['amount']}}
+                        if date:
+                            failed['date'] = date
                     LOGGER.exception(e)
                 except Exception as e:
                     LOGGER.exception(e)
