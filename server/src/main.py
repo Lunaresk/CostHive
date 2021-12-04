@@ -62,7 +62,7 @@ def get_monthly_report_from_user(user: str = None, year: int = None, month: int 
         abort(400)
     LOGGER.info("Getting results.")
     results = DATABASE.get_report(user=user, year=year, month=month)
-    LOGGER.debug("Results get")
+    LOGGER.debug(f"Results received: {results}")
     if results:
         result_dict = group_results(results)
     else:
@@ -76,7 +76,7 @@ def group_results(results: tuple) -> dict:
     for result in results:
         if result[0] not in result_dict:
             result_dict[result[0]] = {}
-        if result[1] not in result_dict[result[0]]:
+        if str(result[1]) not in result_dict[result[0]]:
             result_dict[result[0]][str(result[1])] = {}
         result_dict[result[0]][str(result[1])][result[2]] = (
             result[3], result[4])
