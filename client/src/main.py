@@ -34,12 +34,14 @@ def main() -> None:
         if login == "quit":
             break
         if not connection.check_login(login):
+            LOGGER.debug("Login failed")
             continue  # Send Error that login wasn't possible
+        LOGGER.debug("Login successful")
         scanned = scanning()
         scanned = group_scanning(scanned)
         result = connection.send_scan(login, scanned)
         if result != True:
-            result['date'] = str(date.now())
+            result['date'] = str(date.today())
             TEMP.append(result)
         if TEMP:
             for bought in TEMP:
@@ -51,6 +53,7 @@ def main() -> None:
                 jdump(TEMP, file)
         elif exists(TEMPFILE):
             remove(TEMPFILE)
+        LOGGER.info(TEMP)
 
 
 def scanning() -> list:
@@ -69,10 +72,17 @@ def scanning() -> list:
                     if not i:
                         break  # send a short timeout message before break
                     scan = stdin.readline().strip()
-                    try:
-                        scanned.remove(scan)
-                    except ValueError as e:
-                        LOGGER.exception(e)
+                    match scan:
+                        case "delete":
+                            try:
+                                scanned.pop()
+                            except IndexError as e:
+                                LOGGER.exception(e)
+                        case _:
+                            try:
+                                scanned.remove(scan)
+                            except ValueError as e:
+                                LOGGER.exception(e)
             case _:
                 scanned.append(scan)
     return scanned
