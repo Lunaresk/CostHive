@@ -32,8 +32,8 @@ def check_login(login: str) -> bool:
     return False
 
 
-def send_scan(login: str, scanned: dict[int: int], date:str = None):
-    infos = {'login': login, 'items': scanned}
+def send_scan(user: str, scanned: dict[int: int], date:str = None):
+    infos = {'user': user, 'items': scanned}
     if date:
         infos['date'] = date
     try:

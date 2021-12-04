@@ -40,13 +40,13 @@ def login():
 @app.route('/scan2kasse/insert', methods=['POST'])
 def insert():
     match request.json:
-        case {'login': login, 'items': items, 'date': date}:
-            failed = DATABASE.insert_bought_items(login, items, date)
+        case {'user': user, 'items': items, 'date': date}:
+            failed = DATABASE.insert_bought_items(user, items, date)
             if failed:
                 return jsonify(failed), 400
             return jsonify({'inserted': True}), 201
-        case {'login': login, 'items': items}:
-            failed = DATABASE.insert_bought_items(login, items)
+        case {'user': user, 'items': items}:
+            failed = DATABASE.insert_bought_items(user, items)
             if failed:
                 return jsonify(failed), 400
             return jsonify({'inserted': True}), 201

@@ -30,22 +30,22 @@ TIMEOUT = 60  # Number of seconds for a timeout after being logged in
 
 def main() -> None:
     while True:
-        login = input("Enter Login: ")
-        if login == "quit":
+        user = input("Enter Login: ")
+        if user == "quit":
             break
-        if not connection.check_login(login):
+        if not connection.check_login(user):
             LOGGER.debug("Login failed")
             continue  # Send Error that login wasn't possible
         LOGGER.debug("Login successful")
         scanned = scanning()
         scanned = group_scanning(scanned)
-        result = connection.send_scan(login, scanned)
+        result = connection.send_scan(user, scanned)
         if result != True:
             result['date'] = str(date.today())
             TEMP.append(result)
         if TEMP:
             for bought in TEMP:
-                result = connection.send_scan(bought['login'], bought['items'], bought['date'])
+                result = connection.send_scan(bought['user'], bought['items'], bought['date'])
                 TEMP.remove(bought)
                 if result != True:
                     TEMP.append(result)
