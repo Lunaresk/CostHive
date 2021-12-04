@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import date
 from json import dump as jdump, load as jload
 from os import remove
@@ -22,13 +23,12 @@ consoleHandler = logging.StreamHandler()
 consoleHandler.setLevel(logging.DEBUG)
 LOGGER.addHandler(consoleHandler)
 
-TEMP = []
 TEMPFILE = "scans.json"
 
 TIMEOUT = 60  # Number of seconds for a timeout after being logged in
 
 
-def main() -> None:
+def main(TEMP: list = None) -> None:
     while True:
         user = input("Enter Login: ")
         if user == "quit":
@@ -44,6 +44,7 @@ def main() -> None:
             result['date'] = str(date.today())
             TEMP.append(result)
         if TEMP:
+            TEMP = group_temp(TEMP)
             for bought in list(TEMP):
                 result = connection.send_scan(bought['user'], bought['items'], bought['date'])
                 TEMP.remove(bought)
@@ -87,6 +88,22 @@ def scanning() -> list:
                 scanned.append(scan)
     return scanned
 
+def group_temp(TEMP: list):
+    NEWTEMP = []
+    for temp in TEMP:
+        found = False
+        for newtemp in NEWTEMP:
+            if newtemp['date'] == temp['date'] and newtemp['user'] == temp['user']:
+                for key, value in temp['items'].items():
+                    if key in newtemp['items']:
+                        newtemp['items'][key] += value
+                    else:
+                        newtemp['items'][key] = value
+                found = True
+                break
+        if not found:
+            NEWTEMP.append(deepcopy(temp))
+    return NEWTEMP
 
 def group_scanning(scanned: list[int]) -> dict[int: int]:
     scan_dict = {}
@@ -98,7 +115,8 @@ def group_scanning(scanned: list[int]) -> dict[int: int]:
     return scan_dict
 
 if __name__ == '__main__':
+    TEMP = None
     if exists(TEMPFILE):
         with open(TEMPFILE, "r") as file:
             TEMP = jload(file)
-    main()
+    main(TEMP)
