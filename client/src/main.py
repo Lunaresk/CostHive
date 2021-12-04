@@ -44,7 +44,7 @@ def main() -> None:
             result['date'] = str(date.today())
             TEMP.append(result)
         if TEMP:
-            for bought in TEMP:
+            for bought in list(TEMP):
                 result = connection.send_scan(bought['user'], bought['items'], bought['date'])
                 TEMP.remove(bought)
                 if result != True:
