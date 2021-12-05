@@ -2,8 +2,13 @@ from database import Database
 from flask import Flask, abort, request
 from flask.json import jsonify
 from gevent.pywsgi import WSGIServer
+from os import makedirs
+from os.path import exists
 import logging
 
+
+if not exists("../logs"):
+    makedirs("../logs")
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
