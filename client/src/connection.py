@@ -26,10 +26,15 @@ del(data)
 
 
 def check_login(login: str) -> bool:
-    response = get(url=":".join([SERVER, str(PORT)]) + '/scan2kasse/login', json={'login': login})
-    if response.status_code == 200:
-        return True
-    return False
+    try:
+        response = get(url=":".join([SERVER, str(PORT)]) + '/scan2kasse/login', json={'login': login})
+    except Exception as e:
+        LOGGER.exception(e)
+        return False
+    else:
+        if response.status_code == 200:
+            return True
+        return False
 
 
 def send_scan(user: str, scanned: dict[int: int], date:str = None):
