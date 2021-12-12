@@ -4,4 +4,8 @@ server:
 
 options:
   barcode:
-    codeid_position: Null
+    codeid:
+      position: Null
+      Code128: "A"
+      EAN8: "C"
+      EAN13: "D"

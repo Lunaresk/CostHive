@@ -29,7 +29,10 @@ LOGGER.addHandler(consoleHandler)
 
 with open("config.yaml", 'r') as file:
     data = safe_load(file)['options']
-CODEID_POS = data['barcode']['codeid_position']
+CODEID_POS = data['barcode']['codeid']['position'] if data and 'barcode' in data and 'codeid' in data['barcode'] and 'position' in data['barcode']['codeid'] else None
+CODE128 = data['barcode']['codeid']['Code128'] if data and 'barcode' in data and 'codeid' in data['barcode'] and 'Code128' in data['barcode']['codeid'] else "A"
+EAN8 = data['barcode']['codeid']['EAN8'] if data and 'barcode' in data and 'codeid' in data['barcode'] and 'EAN8' in data['barcode']['codeid'] else "C"
+EAN13 = data['barcode']['codeid']['EAN13'] if data and 'barcode' in data and 'codeid' in data['barcode'] and 'EAN13' in data['barcode']['codeid'] else "D"
 
 TEMPFILE = "scans.json"
 
@@ -51,18 +54,18 @@ def delete(scanned: list):
     if not i:
         return  #TODO send a short timeout message before return
     scan = stdin.readline().strip()
-    codeid, scan = split_codeid(scan, "A")
+    codeid, scan = split_codeid(scan, "")
     match scan:
         case "delete":
             try:
                 scanned.pop()
             except IndexError as e:
-                LOGGER.exception(e)
+                LOGGER.exception()
         case _:
             try:
                 scanned.remove(scan)
             except ValueError as e:
-                LOGGER.exception(e)
+                LOGGER.exception()
 
 def group_scanning(scanned: list[int]) -> dict[int: int]:
     scan_dict = {}
@@ -93,10 +96,10 @@ def group_temp(TEMP: list):
 def login(user: str = None):
     if not user:
         user = input("Enter Login: ")
-        codeid, user = split_codeid(user, "D")
+        codeid, user = split_codeid(user, CODE128)
     else:
-        codeid = "D"
-    if codeid != "D":
+        codeid = CODE128
+    if codeid != CODE128:
         return None
     if not connection.check_login(user):
         LOGGER.debug("Login failed")
@@ -114,9 +117,11 @@ def scanning(user: str) -> dict[int: int]:
         scan = stdin.readline().strip()
         codeid, scan = split_codeid(scan, "A")
         match codeid:
-            case "A":
+            case str(EAN8):
                 scanned.append(scan)
-            case "D":
+            case str(EAN13):
+                scanned.append(scan)
+            case str(CODE128):
                 match scan:
                     case "logout":
                         break
