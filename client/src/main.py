@@ -34,9 +34,14 @@ CODE128 = data['barcode']['codeid']['Code128'] if data and 'barcode' in data and
 EAN8 = data['barcode']['codeid']['EAN8'] if data and 'barcode' in data and 'codeid' in data['barcode'] and 'EAN8' in data['barcode']['codeid'] else "C"
 EAN13 = data['barcode']['codeid']['EAN13'] if data and 'barcode' in data and 'codeid' in data['barcode'] and 'EAN13' in data['barcode']['codeid'] else "D"
 
+OFFLINE_LOGIN = data['users'] if "users" in data else ""
+
+del(data)
+
 TEMPFILE = "scans.json"
 
 TIMEOUT = 60  # Number of seconds for a timeout after being logged in
+SET_AMOUNTS = ["1", "2", "5", "10"]
 
 
 def main() -> None:
@@ -49,49 +54,75 @@ def main() -> None:
         LOGGER.debug("Login successful")
         scanning(user)
 
-def delete(scanned: list):
-    i, _, _ = timedInput([stdin], [], [], TIMEOUT)
-    if not i:
-        return  #TODO send a short timeout message before return
-    scan = stdin.readline().strip()
-    codeid, scan = split_codeid(scan, "")
-    match scan:
-        case "delete":
-            try:
-                scanned.pop()
-            except IndexError as e:
-                LOGGER.exception()
-        case _:
-            try:
-                scanned.remove(scan)
-            except ValueError as e:
-                LOGGER.exception()
+def delete(scanned: list[dict[int: int]]):
+    amount = 1
+    while True:
+        i, _, _ = timedInput([stdin], [], [], TIMEOUT)
+        if not i:
+            return  #TODO send a short timeout message before return
+        scan = stdin.readline().strip()
+        codeid, scan = split_codeid(scan, "")
+        match codeid:
+            case str(EAN8):
+                try:
+                    scanned.remove({scan: amount})
+                except ValueError as e:
+                    scanned.insert(0, {scan: -amount})
+                    LOGGER.debug(f"Tried to delete {scan} with amount {amount}.")
+                finally:
+                    break
+            case str(EAN13):
+                try:
+                    scanned.remove({scan: amount})
+                except ValueError as e:
+                    scanned.insert(0, {scan: -amount})
+                    LOGGER.debug(f"Tried to delete {scan} with amount {amount}.")
+                finally:
+                    break
+            case str(CODE128):
+                match scan:
+                    case "delete":
+                        try:
+                            scanned.pop()
+                        except IndexError as e:
+                            LOGGER.exception()
+                        finally:
+                            break
+                    case _:
+                        try:
+                            amount += int(scan)
+                        except ValueError as e:
+                            LOGGER.exception()
 
-def group_scanning(scanned: list[int]) -> dict[int: int]:
-    scan_dict = {}
-    for scan in scanned:
-        if scan not in scan_dict:
-            scan_dict[scan] = 1
-        else:
-            scan_dict[scan] += 1
-    return scan_dict
-
-def group_temp(TEMP: list):
-    NEWTEMP = []
-    for temp in TEMP:
+def group_previous_scans(previous_scans: list):
+    newscans = []
+    for scan in previous_scans:
         found = False
-        for newtemp in NEWTEMP:
-            if newtemp['date'] == temp['date'] and newtemp['user'] == temp['user']:
-                for key, value in temp['items'].items():
-                    if key in newtemp['items']:
-                        newtemp['items'][key] += value
+        for newscan in newscans:
+            if newscan['date'] == scan['date'] and newscan['user'] == scan['user']:
+                for key, value in scan['items'].items():
+                    if key in newscan['items']:
+                        newscan['items'][key] += value
                     else:
-                        newtemp['items'][key] = value
+                        newscan['items'][key] = value
                 found = True
                 break
         if not found:
-            NEWTEMP.append(deepcopy(temp))
-    return NEWTEMP
+            newscans.append(deepcopy(scan))
+    return newscans
+
+def group_scanning(scanned: list[dict[int: int]]) -> dict[int: int]:
+    scan_dict = {}
+    for scan in scanned:
+        for key, value in scan.items():
+            if key not in scan_dict:
+                scan_dict[scan] = value
+            else:
+                scan_dict[scan] += value
+    for key, value in scan_dict.items():
+        if value <= 0:
+            del(scan_dict[key])
+    return scan_dict
 
 def login(user: str = None):
     if not user:
@@ -103,13 +134,14 @@ def login(user: str = None):
         return None
     if not connection.check_login(user):
         LOGGER.debug("Login failed")
-        if not ("users" in data and user in data['users']):
+        if not user in OFFLINE_LOGIN:
             return None
         LOGGER.debug("Using local login")
     return user
 
 def scanning(user: str) -> dict[int: int]:
     scan, scanned = "", []
+    amount = 1
     while True:
         i, _, _ = timedInput([stdin], [], [], TIMEOUT)
         if not i:
@@ -118,9 +150,11 @@ def scanning(user: str) -> dict[int: int]:
         codeid, scan = split_codeid(scan, "A")
         match codeid:
             case str(EAN8):
-                scanned.append(scan)
+                scanned.append({scan: amount})
+                amount = 1
             case str(EAN13):
-                scanned.append(scan)
+                scanned.append({scan: amount})
+                amount = 1
             case str(CODE128):
                 match scan:
                     case "logout":
@@ -128,38 +162,44 @@ def scanning(user: str) -> dict[int: int]:
                     case "delete":
                         delete(scanned)
                     case _:
-                        altuser = login(scan)
-                        if not altuser:
-                            continue
-                        LOGGER.debug("Login successful")
-                        scanning(altuser)
-                        break
+                        try:
+                            if scan in SET_AMOUNTS:
+                                amount = int(scan)
+                            else:
+                                amount += int(scan)
+                        except:
+                            altuser = login(scan)
+                            if not altuser:
+                                continue
+                            LOGGER.debug("Login successful")
+                            scanning(altuser)
+                            break
             case _:
                 LOGGER.debug(f"Unknown barcode scanned: {codeid}_{scan}")
     scanned = group_scanning(scanned)
     send_scan(user, scanned)
 
-def send_scan(user: str, scanned: list, temp: list[dict] = []):
+def send_scan(user: str, scanned: dict[int: int], previous_scans: list[dict] = []):
     if exists(TEMPFILE):
         with open(TEMPFILE, "r") as file:
-            temp.extend(jload(file))
+            previous_scans.extend(jload(file))
     result = connection.send_scan(user, scanned)
     if result != True:
         result['date'] = str(date.today())
-        temp.append(result)
-    if temp:
-        temp = group_temp(temp)
-        for bought in list(temp):
+        previous_scans.append(result)
+    if previous_scans:
+        previous_scans = group_previous_scans(previous_scans)
+        for bought in list(previous_scans):
             result = connection.send_scan(bought['user'], bought['items'], bought['date'])
-            temp.remove(bought)
+            previous_scans.remove(bought)
             if result != True:
-                temp.append(result)
-    if temp: # if temp still present, save it
+                previous_scans.append(result)
+    if previous_scans: # if previous scans still present, save it
         with open(TEMPFILE, "w") as file:
-            jdump(temp, file)
-    elif exists(TEMPFILE):
+            jdump(previous_scans, file)
+    elif exists(TEMPFILE): # if no scans remain, delete the json
         remove(TEMPFILE)
-    LOGGER.info(temp)
+    LOGGER.info(previous_scans)
 
 def split_codeid(scan: str, default_codeid: str = ""):
     match CODEID_POS:
