@@ -66,9 +66,9 @@ class Database:
                 try:
                     result = cursor.fetchall()
                 except ProgrammingError as e:
-                    LOGGER.exception()
+                    LOGGER.exception("")
                 except Exception as e:
-                    LOGGER.exception()
+                    LOGGER.exception("")
         return result
 
     @connectionpersistence
@@ -97,9 +97,9 @@ class Database:
             try:
                 result = cursor.fetchall()
             except ProgrammingError as e:
-                LOGGER.exception()
+                LOGGER.exception("")
             except Exception as e:
-                LOGGER.exception()
+                LOGGER.exception("")
         return result
 
     @connectionpersistence
@@ -125,9 +125,9 @@ class Database:
                         failed = {'user': user, 'items': {value['item']: value['amount']}}
                         if date:
                             failed['date'] = date
-                    LOGGER.exception()
+                    LOGGER.exception("")
                 except Exception as e:
-                    LOGGER.exception()
+                    LOGGER.exception("")
         return failed
 
     def __delete__(self):

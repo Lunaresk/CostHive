@@ -1,3 +1,4 @@
+from constants import Barcode_CodeID, Scan_Options
 from copy import deepcopy
 from datetime import date
 from json import dump as jdump, load as jload
@@ -27,17 +28,6 @@ consoleHandler = logging.StreamHandler()
 consoleHandler.setLevel(logging.DEBUG)
 LOGGER.addHandler(consoleHandler)
 
-with open("config.yaml", 'r') as file:
-    data = safe_load(file)['options']
-CODEID_POS = data['barcode']['codeid']['position'] if data and 'barcode' in data and 'codeid' in data['barcode'] and 'position' in data['barcode']['codeid'] else None
-CODE128 = data['barcode']['codeid']['Code128'] if data and 'barcode' in data and 'codeid' in data['barcode'] and 'Code128' in data['barcode']['codeid'] else "A"
-EAN8 = data['barcode']['codeid']['EAN8'] if data and 'barcode' in data and 'codeid' in data['barcode'] and 'EAN8' in data['barcode']['codeid'] else "C"
-EAN13 = data['barcode']['codeid']['EAN13'] if data and 'barcode' in data and 'codeid' in data['barcode'] and 'EAN13' in data['barcode']['codeid'] else "D"
-
-OFFLINE_LOGIN = data['users'] if "users" in data else ""
-
-del(data)
-
 TEMPFILE = "scans.json"
 
 TIMEOUT = 60  # Number of seconds for a timeout after being logged in
@@ -63,7 +53,7 @@ def delete(scanned: list[dict[int: int]]):
         scan = stdin.readline().strip()
         codeid, scan = split_codeid(scan, "")
         match codeid:
-            case str(EAN8):
+            case Barcode_CodeID.EAN8:
                 try:
                     scanned.remove({scan: amount})
                 except ValueError as e:
@@ -71,7 +61,7 @@ def delete(scanned: list[dict[int: int]]):
                     LOGGER.debug(f"Tried to delete {scan} with amount {amount}.")
                 finally:
                     break
-            case str(EAN13):
+            case Barcode_CodeID.EAN13:
                 try:
                     scanned.remove({scan: amount})
                 except ValueError as e:
@@ -79,20 +69,20 @@ def delete(scanned: list[dict[int: int]]):
                     LOGGER.debug(f"Tried to delete {scan} with amount {amount}.")
                 finally:
                     break
-            case str(CODE128):
+            case Barcode_CodeID.CODE128:
                 match scan:
-                    case "delete":
+                    case Scan_Options.DELETE:
                         try:
                             scanned.pop()
                         except IndexError as e:
-                            LOGGER.exception()
+                            LOGGER.exception("")
                         finally:
                             break
                     case _:
                         try:
                             amount += int(scan)
                         except ValueError as e:
-                            LOGGER.exception()
+                            LOGGER.exception("")
 
 def group_previous_scans(previous_scans: list):
     newscans = []
@@ -116,9 +106,9 @@ def group_scanning(scanned: list[dict[int: int]]) -> dict[int: int]:
     for scan in scanned:
         for key, value in scan.items():
             if key not in scan_dict:
-                scan_dict[scan] = value
+                scan_dict[key] = value
             else:
-                scan_dict[scan] += value
+                scan_dict[key] += value
     for key, value in scan_dict.items():
         if value <= 0:
             del(scan_dict[key])
@@ -127,14 +117,14 @@ def group_scanning(scanned: list[dict[int: int]]) -> dict[int: int]:
 def login(user: str = None):
     if not user:
         user = input("Enter Login: ")
-        codeid, user = split_codeid(user, CODE128)
+        codeid, user = split_codeid(user, Barcode_CodeID.CODE128)
     else:
-        codeid = CODE128
-    if codeid != CODE128:
+        codeid = Barcode_CodeID.CODE128
+    if codeid != Barcode_CodeID.CODE128:
         return None
     if not connection.check_login(user):
         LOGGER.debug("Login failed")
-        if not user in OFFLINE_LOGIN:
+        if not user in Barcode_CodeID.OFFLINE_LOGIN:
             return None
         LOGGER.debug("Using local login")
     return user
@@ -149,17 +139,17 @@ def scanning(user: str) -> dict[int: int]:
         scan = stdin.readline().strip()
         codeid, scan = split_codeid(scan, "A")
         match codeid:
-            case str(EAN8):
+            case Barcode_CodeID.EAN8:
                 scanned.append({scan: amount})
                 amount = 1
-            case str(EAN13):
+            case Barcode_CodeID.EAN13:
                 scanned.append({scan: amount})
                 amount = 1
-            case str(CODE128):
+            case Barcode_CodeID.CODE128:
                 match scan:
-                    case "logout":
+                    case Scan_Options.LOGOUT:
                         break
-                    case "delete":
+                    case Scan_Options.DELETE:
                         delete(scanned)
                     case _:
                         try:
@@ -202,7 +192,7 @@ def send_scan(user: str, scanned: dict[int: int], previous_scans: list[dict] = [
     LOGGER.info(previous_scans)
 
 def split_codeid(scan: str, default_codeid: str = ""):
-    match CODEID_POS:
+    match Barcode_CodeID.CODEID_POS:
         case "prefix":
             return(scan[0], scan[1:])
         case "suffix":
