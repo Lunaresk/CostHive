@@ -1,4 +1,4 @@
-from constants import Barcode_CodeID, Scan_Options
+from constants import Barcode_CodeID, Offline_Login, Scan_Options
 from copy import deepcopy
 from datetime import date
 from json import dump as jdump, load as jload
@@ -124,7 +124,7 @@ def login(user: str = None):
         return None
     if not connection.check_login(user):
         LOGGER.debug("Login failed")
-        if not user in Barcode_CodeID.OFFLINE_LOGIN:
+        if not user in Offline_Login.OFFLINE_LOGIN:
             return None
         LOGGER.debug("Using local login")
     return user
