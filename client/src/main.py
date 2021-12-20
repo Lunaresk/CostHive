@@ -166,7 +166,6 @@ def scanning(user: str) -> dict[int: int]:
     send_scan(user, scanned)
 
 def send_scan(user: str, scanned: dict[int: int], previous_scans: list[dict[any: any]] = None):
-    LOGGER.debug(previous_scans)
     if not previous_scans:
         previous_scans = []
     if exists(TEMPFILE):
@@ -189,6 +188,7 @@ def send_scan(user: str, scanned: dict[int: int], previous_scans: list[dict[any:
             jdump(previous_scans, file)
     elif exists(TEMPFILE): # if no scans remain, delete the json
         remove(TEMPFILE)
+    LOGGER.info(previous_scans)
 
 def split_codeid(scan: str, default_codeid: str = ""):
     match Barcode_CodeID.CODEID_POS:
