@@ -3,7 +3,7 @@ from copy import deepcopy
 from datetime import date
 from json import dump as jdump, load as jload
 from os import makedirs, remove
-from os.path import exists
+from os.path import exists, dirname
 from select import select as timedInput
 from sys import stdin
 from yaml import safe_load
@@ -11,15 +11,17 @@ import connection
 import logging
 
 
-if not exists("../logs"):
-    makedirs("../logs")
+DIR = dirname(__file__) + "/"
+
+if not exists(DIR + "../logs"):
+    makedirs(DIR + "../logs")
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
 logFormatter = logging.Formatter(
     "%(asctime)s [%(threadName)s] [%(levelname)s]  %(message)s")
 
-fileHandler = logging.FileHandler("../logs/client.log")
+fileHandler = logging.FileHandler(DIR + "../logs/client.log")
 fileHandler.setFormatter(logFormatter)
 fileHandler.setLevel(logging.INFO)
 LOGGER.addHandler(fileHandler)
@@ -28,7 +30,7 @@ consoleHandler = logging.StreamHandler()
 consoleHandler.setLevel(logging.DEBUG)
 LOGGER.addHandler(consoleHandler)
 
-TEMPFILE = "scans.json"
+TEMPFILE = DIR + "scans.json"
 
 TIMEOUT = 60  # Number of seconds for a timeout after being logged in
 SET_AMOUNTS = ["1", "2", "5", "10"]
@@ -39,8 +41,6 @@ def main() -> None:
         user = login()
         if not user:
             continue
-        if user == "quit":
-            break
         LOGGER.debug("Login successful")
         scanning(user)
 
@@ -84,22 +84,18 @@ def delete(scanned: list[dict[int: int]]):
                         except ValueError as e:
                             LOGGER.exception("")
 
-def group_previous_scans(previous_scans: list):
-    newscans = []
-    for scan in previous_scans:
-        found = False
-        for newscan in newscans:
-            if newscan['date'] == scan['date'] and newscan['user'] == scan['user']:
-                for key, value in scan['items'].items():
-                    if key in newscan['items']:
-                        newscan['items'][key] += value
+def group_previous_scans(previous_scans: list[dict[any: any]]):
+    for i in range(len(previous_scans))[::-1]:
+        for j in range(len(previous_scans[i:])-1):
+            j = i+j+1
+            if previous_scans[i]['date'] == previous_scans[j]['date'] and previous_scans[i]['user'] == previous_scans[j]['user']:
+                for key, value in previous_scans[i]['items'].items():
+                    if key in previous_scans[j]['items']:
+                        previous_scans[j]['items'][key] += value
                     else:
-                        newscan['items'][key] = value
-                found = True
+                        previous_scans[j]['items'][key] = value
+                del(previous_scans[i])
                 break
-        if not found:
-            newscans.append(deepcopy(scan))
-    return newscans
 
 def group_scanning(scanned: list[dict[int: int]]) -> dict[int: int]:
     scan_dict = {}
@@ -137,7 +133,7 @@ def scanning(user: str) -> dict[int: int]:
         if not i:
             break  # send a short timeout message before break
         scan = stdin.readline().strip()
-        codeid, scan = split_codeid(scan, "A")
+        codeid, scan = split_codeid(scan, Barcode_CodeID.EAN8)
         match codeid:
             case Barcode_CodeID.EAN8:
                 scanned.append({scan: amount})
@@ -169,17 +165,21 @@ def scanning(user: str) -> dict[int: int]:
     scanned = group_scanning(scanned)
     send_scan(user, scanned)
 
-def send_scan(user: str, scanned: dict[int: int], previous_scans: list[dict] = []):
+def send_scan(user: str, scanned: dict[int: int], previous_scans: list[dict[any: any]] = None):
+    LOGGER.debug(previous_scans)
+    if not previous_scans:
+        previous_scans = []
     if exists(TEMPFILE):
         with open(TEMPFILE, "r") as file:
             previous_scans.extend(jload(file))
-    result = connection.send_scan(user, scanned)
-    if result != True:
-        result['date'] = str(date.today())
-        previous_scans.append(result)
+    if scanned:
+        result = connection.send_scan(user, scanned)
+        if result != True:
+            result['date'] = str(date.today())
+            previous_scans.append(result)
     if previous_scans:
-        previous_scans = group_previous_scans(previous_scans)
-        for bought in list(previous_scans):
+        group_previous_scans(previous_scans)
+        for bought in previous_scans:
             result = connection.send_scan(bought['user'], bought['items'], bought['date'])
             previous_scans.remove(bought)
             if result != True:
@@ -189,7 +189,6 @@ def send_scan(user: str, scanned: dict[int: int], previous_scans: list[dict] = [
             jdump(previous_scans, file)
     elif exists(TEMPFILE): # if no scans remain, delete the json
         remove(TEMPFILE)
-    LOGGER.info(previous_scans)
 
 def split_codeid(scan: str, default_codeid: str = ""):
     match Barcode_CodeID.CODEID_POS:

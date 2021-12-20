@@ -3,19 +3,21 @@ from flask import Flask, abort, request
 from flask.json import jsonify
 from gevent.pywsgi import WSGIServer
 from os import makedirs
-from os.path import exists
+from os.path import exists, dirname
 import logging
 
 
-if not exists("../logs"):
-    makedirs("../logs")
+DIR = dirname(__file__) + "/"
+
+if not exists(DIR + "../logs"):
+    makedirs(DIR + "../logs")
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
 logFormatter = logging.Formatter(
     "%(asctime)s [%(threadName)s] [%(levelname)s]  %(message)s")
 
-fileHandler = logging.FileHandler("../logs/server.log")
+fileHandler = logging.FileHandler(DIR + "../logs/server.log")
 fileHandler.setFormatter(logFormatter)
 fileHandler.setLevel(logging.INFO)
 LOGGER.addHandler(fileHandler)

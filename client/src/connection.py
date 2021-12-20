@@ -1,14 +1,17 @@
+from os.path import dirname
 from requests import get, put, post, delete
 from yaml import safe_load
 import logging
 
+
+DIR = dirname(__file__) + "/"
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
 logFormatter = logging.Formatter(
     "%(asctime)s [%(threadName)s] [%(levelname)s]  %(message)s")
 
-fileHandler = logging.FileHandler("../logs/connection.log")
+fileHandler = logging.FileHandler(DIR + "../logs/connection.log")
 fileHandler.setFormatter(logFormatter)
 fileHandler.setLevel(logging.INFO)
 LOGGER.addHandler(fileHandler)
@@ -18,7 +21,7 @@ consoleHandler.setLevel(logging.DEBUG)
 LOGGER.addHandler(consoleHandler)
 
 
-with open("config.yaml", 'r') as file:
+with open(DIR + "config.yaml", 'r') as file:
     data = safe_load(file)['server']
 SERVER = data['host']
 PORT = data['port']
