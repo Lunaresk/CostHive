@@ -3,7 +3,7 @@ from copy import deepcopy
 from datetime import date
 from json import dump as jdump, load as jload
 from os import makedirs, remove
-from os.path import exists, dirname
+from os.path import dirname, exists
 from select import select as timedInput
 from sys import stdin
 from yaml import safe_load

@@ -43,14 +43,18 @@ class Database:
             LOGGER.info("Connection was not set, setting...")
             self.connect()
         else:
-            with self.conn.cursor() as cursor:
-                try:
-                    cursor.execute("SELECT 1;")
-                    cursor.fetchall()
-                except:
-                    LOGGER.warn(
-                        'Connection seem to timed out, reconnecting...')
-                    self.connect()
+            try:
+                with self.conn.cursor() as cursor:
+                    try:
+                        cursor.execute("SELECT 1;")
+                        cursor.fetchall()
+                    except:
+                        LOGGER.warn(
+                            'Connection seem to timed out, reconnecting...')
+                        self.connect()
+            except:
+                LOGGER.warn('Connection seem to timed out, reconnecting...')
+                self.connect()
 
     def connectionpersistence(func):
         def wrapper(*args, **kwargs):

@@ -3,7 +3,7 @@ from flask import Flask, abort, request
 from flask.json import jsonify
 from gevent.pywsgi import WSGIServer
 from os import makedirs
-from os.path import exists, dirname
+from os.path import dirname, exists
 import logging
 
 
