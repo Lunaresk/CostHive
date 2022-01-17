@@ -9,8 +9,8 @@ import logging
 
 DIR = dirname(__file__) + "/"
 
-if not exists(DIR + "../logs"):
-    makedirs(DIR + "../logs")
+if not exists(DIR + "../../logs"):
+    makedirs(DIR + "../../logs")
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
@@ -91,6 +91,7 @@ def group_results(results: tuple) -> dict:
             result_dict[result[0]][str(result[1])] = {}
         result_dict[result[0]][str(result[1])][result[2]] = (
             result[3], result[4])
-        result_dict[result[0]]["sum"] += (result[3] * (result[4] * 100)) / 100
+        amount, price = int(result[3]), float(result[4].split(" ")[0].replace(",", "."))
+        result_dict[result[0]]["sum"] += (amount * (price * 100)) / 100
     LOGGER.debug("Grouped.")
     return result_dict
