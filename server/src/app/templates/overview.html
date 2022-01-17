@@ -3,7 +3,7 @@
 {% block content %}
     {% for user, dates in results.items() %}
         <div class="row">
-            <h3>{{ user }}: {{ dates.sum }}€</h3>
+            <h3>{{ user }}: {{ dates.sum }} €</h3>
             {% for date, items in dates.items() %}
                 {% if date != "sum" %}
                     <div class="row">
