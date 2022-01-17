@@ -1,6 +1,6 @@
 from app import app
 from app.database import Database
-from flask import abort, request
+from flask import abort, request, render_template
 from flask.json import jsonify
 from os import makedirs
 from os.path import dirname, exists
@@ -75,7 +75,10 @@ def get_monthly_report_from_user(user: str = None, year: int = None, month: int 
         result_dict = group_results(results)
     else:
         result_dict = {}
-    return jsonify(result_dict)
+    if request.content_type == "application/json":
+        return jsonify(result_dict)
+    else:
+        return render_template("overview.html", results=result_dict)
 
 
 def group_results(results: tuple) -> dict:
@@ -83,10 +86,11 @@ def group_results(results: tuple) -> dict:
     LOGGER.debug("Grouping...")
     for result in results:
         if result[0] not in result_dict:
-            result_dict[result[0]] = {}
+            result_dict[result[0]] = {"sum": 0}
         if str(result[1]) not in result_dict[result[0]]:
             result_dict[result[0]][str(result[1])] = {}
         result_dict[result[0]][str(result[1])][result[2]] = (
             result[3], result[4])
+        result_dict[result[0]]["sum"] += (result[3] * (result[4] * 100)) / 100
     LOGGER.debug("Grouped.")
     return result_dict

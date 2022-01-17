@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% for user, dates in results.items() %}
+        <div class="row">
+            <h3>{{ user }}: {{ dates.sum }}€</h3>
+            {% for date, items in dates.items() %}
+                {% if date != "sum" %}
+                    <div class="row">
+                        <div class="col-sm-1"></div>
+                        <div class="col">
+                            <h4>{{ date }}</h4>
+                            {% for item, values in items.items() %}
+                                <div class="row">
+                                    <div class="col-sm-1"></div>
+                                    <div class="col">
+                                        {{ values.0 }}x {{ item }} je {{ values.1 }}€
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% endblock %}
