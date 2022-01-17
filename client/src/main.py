@@ -178,7 +178,7 @@ def send_scan(user: str, scanned: dict[int: int], previous_scans: list[dict[any:
             previous_scans.append(result)
     if previous_scans:
         group_previous_scans(previous_scans)
-        for bought in previous_scans:
+        for bought in deepcopy(previous_scans):
             result = connection.send_scan(bought['user'], bought['items'], bought['date'])
             previous_scans.remove(bought)
             if result != True:
