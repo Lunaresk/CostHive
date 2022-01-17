@@ -11,7 +11,7 @@ LOGGER.setLevel(logging.DEBUG)
 logFormatter = logging.Formatter(
     "%(asctime)s [%(threadName)s] [%(levelname)s]  %(message)s")
 
-fileHandler = logging.FileHandler(DIR + "../logs/database.log")
+fileHandler = logging.FileHandler(DIR + "../../logs/database.log")
 fileHandler.setFormatter(logFormatter)
 fileHandler.setLevel(logging.INFO)
 LOGGER.addHandler(fileHandler)
