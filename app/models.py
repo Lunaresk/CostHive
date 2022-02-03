@@ -47,7 +47,7 @@ class Item(db.Model):
 
     Category = db.relationship("Category", secondary=item_category, lazy="dynamic", back_populates="Item")
 
-    product = db.relationship("Bought", backref='Item', lazy='dynamic')
+    Item = db.relationship("Bought", backref='Item', lazy='dynamic')
     
     def __repr__(self) -> str:
         return f"<Item {self.id} ({self.name})>"
