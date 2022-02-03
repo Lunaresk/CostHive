@@ -40,7 +40,7 @@ class Category(db.Model):
         return f"<Category {self.id} ({self.name})>"
 
 class Item(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
     name = db.Column(db.String(64))
     brand = db.Column(db.ForeignKey('brand.id'))
     description = db.Column(db.Text)
@@ -74,7 +74,7 @@ class PriceChange(db.Model):
 class AmountChange(db.Model):
     item = db.Column(db.ForeignKey('item.id'), primary_key=True)
     date = db.Column(db.Date, primary_key=True)
-    Amount = db.Column(db.SmallInteger)
+    amount = db.Column(db.SmallInteger)
     
     def __repr__(self) -> str:
         return f"<Amount_Change {self.item} ({self.date})>"

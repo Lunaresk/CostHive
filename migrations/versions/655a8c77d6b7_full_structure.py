@@ -1,8 +1,8 @@
 """full structure
 
-Revision ID: b5c06e4e3328
+Revision ID: 655a8c77d6b7
 Revises: 
-Create Date: 2022-02-03 17:23:47.469549
+Create Date: 2022-02-03 18:25:44.422693
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b5c06e4e3328'
+revision = '655a8c77d6b7'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -35,7 +35,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('item',
-    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('name', sa.String(length=64), nullable=True),
     sa.Column('brand', sa.Integer(), nullable=True),
     sa.Column('description', sa.Text(), nullable=True),
@@ -43,15 +43,15 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('amount_change',
-    sa.Column('item', sa.Integer(), nullable=False),
+    sa.Column('item', sa.BigInteger(), nullable=False),
     sa.Column('date', sa.Date(), nullable=False),
-    sa.Column('Amount', sa.SmallInteger(), nullable=True),
+    sa.Column('amount', sa.SmallInteger(), nullable=True),
     sa.ForeignKeyConstraint(['item'], ['item.id'], ),
     sa.PrimaryKeyConstraint('item', 'date')
     )
     op.create_table('bought',
     sa.Column('user', sa.String(length=10), nullable=False),
-    sa.Column('item', sa.Integer(), nullable=False),
+    sa.Column('item', sa.BigInteger(), nullable=False),
     sa.Column('date', sa.Date(), nullable=True),
     sa.Column('amount', sa.SmallInteger(), nullable=True),
     sa.ForeignKeyConstraint(['item'], ['item.id'], ),
@@ -59,14 +59,14 @@ def upgrade():
     sa.PrimaryKeyConstraint('user', 'item')
     )
     op.create_table('item_category',
-    sa.Column('item', sa.Integer(), nullable=False),
+    sa.Column('item', sa.BigInteger(), nullable=False),
     sa.Column('category', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['category'], ['category.id'], ),
     sa.ForeignKeyConstraint(['item'], ['item.id'], ),
     sa.PrimaryKeyConstraint('item', 'category')
     )
     op.create_table('price_change',
-    sa.Column('item', sa.Integer(), nullable=False),
+    sa.Column('item', sa.BigInteger(), nullable=False),
     sa.Column('date', sa.Date(), nullable=False),
     sa.Column('price', sa.SmallInteger(), nullable=True),
     sa.ForeignKeyConstraint(['item'], ['item.id'], ),
