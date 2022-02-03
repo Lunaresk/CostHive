@@ -55,7 +55,7 @@ class Item(db.Model):
 class Bought(db.Model):
     user = db.Column(db.ForeignKey('user.id'), primary_key=True)
     item = db.Column(db.ForeignKey('item.id'), primary_key=True)
-    date = db.Column(db.Date)
+    date = db.Column(db.Date, primary_key=True)
     amount = db.Column(db.SmallInteger)
 
 
