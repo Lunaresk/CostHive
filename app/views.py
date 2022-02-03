@@ -1,31 +1,8 @@
-from app import app
+from app import app, LOGGER
 from app.database import Database
 from app.forms import NewItemForm
 from flask import abort, request, render_template
 from flask.json import jsonify
-from os import makedirs
-from os.path import dirname, exists
-import logging
-
-
-DIR = dirname(__file__) + "/"
-
-if not exists(DIR + "../../logs"):
-    makedirs(DIR + "../../logs")
-
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
-logFormatter = logging.Formatter(
-    "%(asctime)s [%(threadName)s] [%(levelname)s]  %(message)s")
-
-fileHandler = logging.FileHandler(DIR + "../../logs/server.log")
-fileHandler.setFormatter(logFormatter)
-fileHandler.setLevel(logging.INFO)
-LOGGER.addHandler(fileHandler)
-
-consoleHandler = logging.StreamHandler()
-consoleHandler.setLevel(logging.DEBUG)
-LOGGER.addHandler(consoleHandler)
 
 DATABASE = Database()
 
@@ -38,6 +15,8 @@ def index():
 
 @app.route('/test')
 def test():
+    if request.args:
+        LOGGER.debug(request.args['testing'])
     form = NewItemForm()
     return render_template("test.html", form=form)
 
@@ -67,11 +46,15 @@ def insert():
         case _:
             abort(400)
 
-@app.route(f'/{APPNAME}/<string:user>', methods=['GET'])
-@app.route(f'/{APPNAME}/<int:year>/<int:month>', methods=['GET'])
-@app.route(f'/{APPNAME}/<string:user>/<int:year>', methods=['GET'])
-@app.route(f'/{APPNAME}/<string:user>/<int:year>/<int:month>', methods=['GET'])
-def get_monthly_report_from_user(user: str = None, year: int = None, month: int = None):
+@app.route(f'/{APPNAME}/overview', methods=['GET'])
+def get_report_from_user():
+    user, month, year = []*3
+    if request.args:
+        args = request.args
+        if 'month' in args:
+            month = args['month']
+        if 'year' in args:
+            year = args['year']
     if month and (month > 12 or month < 1):
         abort(400)
     LOGGER.info("Getting results.")

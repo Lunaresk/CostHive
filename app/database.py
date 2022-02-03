@@ -1,24 +1,6 @@
-from os.path import dirname
+from app import LOGGER
 from psycopg2 import connect as psyconn, ProgrammingError, errors
 from yaml import safe_load
-import logging
-
-
-DIR = dirname(__file__) + "/"
-
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
-logFormatter = logging.Formatter(
-    "%(asctime)s [%(threadName)s] [%(levelname)s]  %(message)s")
-
-fileHandler = logging.FileHandler(DIR + "../../logs/database.log")
-fileHandler.setFormatter(logFormatter)
-fileHandler.setLevel(logging.INFO)
-LOGGER.addHandler(fileHandler)
-
-consoleHandler = logging.StreamHandler()
-consoleHandler.setLevel(logging.DEBUG)
-LOGGER.addHandler(consoleHandler)
 
 
 class Database:
@@ -27,7 +9,7 @@ class Database:
         pass
 
     def connect(self, **kwargs):
-        with open(DIR + 'config.yaml', 'r') as file:
+        with open('configs/config.yaml', 'r') as file:
             data = safe_load(file)['database']
         LOGGER.debug('Merging passed arguments with default arguments.')
         for key, value in data.items():
