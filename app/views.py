@@ -1,5 +1,6 @@
 from app import app
 from app.database import Database
+from app.forms import NewItemForm
 from flask import abort, request, render_template
 from flask.json import jsonify
 from os import makedirs
@@ -34,6 +35,11 @@ APPNAME = "scan2kasse"
 @app.route('/')
 def index():
     return "<h1>Hello, World!</h>", 200
+
+@app.route('/test')
+def test():
+    form = NewItemForm()
+    return render_template("test.html", form=form)
 
 
 @app.route(f'/{APPNAME}/login')
