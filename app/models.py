@@ -63,7 +63,7 @@ class Bought(db.Model):
     def __repr__(self) -> str:
         return f"<Bought Object>"
 
-class Price_Change(db.Model):
+class PriceChange(db.Model):
     item = db.Column(db.ForeignKey('item.id'), primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     price = db.Column(db.SmallInteger)
@@ -71,7 +71,7 @@ class Price_Change(db.Model):
     def __repr__(self) -> str:
         return f"<Price_Change {self.item} ({self.date})>"
 
-class Amount_Change(db.Model):
+class AmountChange(db.Model):
     item = db.Column(db.ForeignKey('item.id'), primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     Amount = db.Column(db.SmallInteger)
