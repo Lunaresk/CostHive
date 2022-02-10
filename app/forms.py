@@ -15,7 +15,7 @@ class NewItemForm(FlaskForm):
     description = StringField("Description", validators=[DataRequired()])
     date = DateField("Insert Date", validators=[DataRequired()])
     price_change = FloatField("Price", validators=[DataRequired()])
-    amount_change = IntegerField("Amount", validators=[DataRequired()])
+    amount_change = IntegerField("Amount")
     category = SelectMultipleField("Categories", choices=[(c.id, c.name) for c in Category.query.order_by("name").all()], validators=[DataRequired()])
     brand = SelectField("Brand", choices=[(b.id, b.name) for b in Brand.query.order_by("name").all()], validators=[DataRequired()])
     submit = SubmitField("Submit")
