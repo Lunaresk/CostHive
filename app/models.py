@@ -1,4 +1,5 @@
 from app import db, login
+from datetime import date
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -77,15 +78,15 @@ class Bought(db.Model):
     item = db.Column(db.ForeignKey('item.id'), primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     amount = db.Column(db.SmallInteger, nullable=False)
-    registered = db.Column(db.Boolean, nullable=False, default=False)
-    paid = db.Column(db.SmallInteger, nullable=False, default=0)
+    registered = db.Column(db.Boolean, nullable=False, server_default=str(False))
+    paid = db.Column(db.SmallInteger, nullable=False, server_default=str(0))
 
     def __repr__(self) -> str:
         return f"<Bought Object>"
 
 class PriceChange(db.Model):
     item = db.Column(db.ForeignKey('item.id'), primary_key=True)
-    date = db.Column(db.Date, primary_key=True)
+    date = db.Column(db.Date, primary_key=True, server_default=str(date(2021, 12, 1)))
     price = db.Column(db.SmallInteger, nullable=False)
     
     def __repr__(self) -> str:
@@ -93,8 +94,8 @@ class PriceChange(db.Model):
 
 class AmountChange(db.Model):
     item = db.Column(db.ForeignKey('item.id'), primary_key=True)
-    date = db.Column(db.Date, primary_key=True)
-    amount = db.Column(db.SmallInteger, nullable=False, default=1)
+    date = db.Column(db.Date, primary_key=True, server_default=str(date(2021, 12, 1)))
+    amount = db.Column(db.SmallInteger, nullable=False, server_default=str(1))
     
     def __repr__(self) -> str:
         return f"<Amount_Change {self.item} ({self.date})>"
@@ -102,8 +103,8 @@ class AmountChange(db.Model):
 class Receipt(db.Model):
     id = db.Column(db.Numeric(precision=22, scale=0), primary_key=True)
     date = db.Column(db.Date, nullable=False)
-    registered = db.Column(db.Boolean, nullable=False, default=False)
-    paid = db.Column(db.SmallInteger, nullable=False, default=0)
+    registered = db.Column(db.Boolean, nullable=False, server_default=str(False))
+    paid = db.Column(db.SmallInteger, nullable=False, server_default=str(0))
     
     def __repr__(self) -> str:
         return f"<Receipt {self.id}>"

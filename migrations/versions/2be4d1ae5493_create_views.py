@@ -1,8 +1,8 @@
 """create views
 
-Revision ID: 3d5fb9e86939
-Revises: dbf88acb76bc
-Create Date: 2022-02-20 01:58:37.444542
+Revision ID: 2be4d1ae5493
+Revises: 05fce74b56cb
+Create Date: 2022-02-20 16:33:01.900378
 
 """
 from alembic import op
@@ -12,10 +12,9 @@ from app import db
 from app.utils.view_utils import selectable_price_per_amount_view, selectable_bought_with_prices_view
 from sqlalchemy_utils import create_view
 
-
 # revision identifiers, used by Alembic.
-revision = '3d5fb9e86939'
-down_revision = 'dbf88acb76bc'
+revision = '2be4d1ae5493'
+down_revision = '05fce74b56cb'
 branch_labels = None
 depends_on = None
 

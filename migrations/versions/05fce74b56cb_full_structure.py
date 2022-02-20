@@ -1,8 +1,8 @@
 """full structure
 
-Revision ID: dbf88acb76bc
+Revision ID: 05fce74b56cb
 Revises: 
-Create Date: 2022-02-20 01:58:13.735541
+Create Date: 2022-02-20 16:31:34.589805
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'dbf88acb76bc'
+revision = '05fce74b56cb'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -37,8 +37,8 @@ def upgrade():
     op.create_table('receipt',
     sa.Column('id', sa.Numeric(precision=22, scale=0), nullable=False),
     sa.Column('date', sa.Date(), nullable=False),
-    sa.Column('registered', sa.Boolean(), nullable=False),
-    sa.Column('paid', sa.SmallInteger(), nullable=False),
+    sa.Column('registered', sa.Boolean(), server_default='False', nullable=False),
+    sa.Column('paid', sa.SmallInteger(), server_default='0', nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user',
@@ -69,8 +69,8 @@ def upgrade():
     )
     op.create_table('amount_change',
     sa.Column('item', sa.BigInteger(), nullable=False),
-    sa.Column('date', sa.Date(), nullable=False),
-    sa.Column('amount', sa.SmallInteger(), nullable=False),
+    sa.Column('date', sa.Date(), server_default='2021-12-01', nullable=False),
+    sa.Column('amount', sa.SmallInteger(), server_default='1', nullable=False),
     sa.ForeignKeyConstraint(['item'], ['item.id'], ),
     sa.PrimaryKeyConstraint('item', 'date')
     )
@@ -79,8 +79,8 @@ def upgrade():
     sa.Column('item', sa.BigInteger(), nullable=False),
     sa.Column('date', sa.Date(), nullable=False),
     sa.Column('amount', sa.SmallInteger(), nullable=False),
-    sa.Column('registered', sa.Boolean(), nullable=False),
-    sa.Column('paid', sa.SmallInteger(), nullable=False),
+    sa.Column('registered', sa.Boolean(), server_default='False', nullable=False),
+    sa.Column('paid', sa.SmallInteger(), server_default='0', nullable=False),
     sa.ForeignKeyConstraint(['item'], ['item.id'], ),
     sa.ForeignKeyConstraint(['token'], ['login_token.token'], ),
     sa.PrimaryKeyConstraint('token', 'item', 'date')
@@ -102,7 +102,7 @@ def upgrade():
     )
     op.create_table('price_change',
     sa.Column('item', sa.BigInteger(), nullable=False),
-    sa.Column('date', sa.Date(), nullable=False),
+    sa.Column('date', sa.Date(), server_default='2021-12-01', nullable=False),
     sa.Column('price', sa.SmallInteger(), nullable=False),
     sa.ForeignKeyConstraint(['item'], ['item.id'], ),
     sa.PrimaryKeyConstraint('item', 'date')
