@@ -28,5 +28,6 @@ app.config.from_file("configs/config.yaml", safe_load)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db, render_as_batch=True)
 login = LoginManager(app)
+login.login_view = 'web_login'
 
-from app import views, models
+from app import routes, models

@@ -1,27 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% for user, dates in results.items() %}
-        <div class="row">
-            <h3>{{ user }}: {{ dates.sum }} €</h3>
-            {% for date, items in dates.items() %}
-                {% if date != "sum" %}
-                    <div class="row">
-                        <div class="col-sm-1"></div>
-                        <div class="col">
-                            <h4>{{ date }}</h4>
-                            {% for item, values in items.items() %}
-                                <div class="row">
-                                    <div class="col-sm-1"></div>
-                                    <div class="col">
-                                        {{ values.0 }}x {{ item }} je {{ values.1 }}
-                                    </div>
+    {% for user in results %}
+        <div class="card">
+            <a class="btn btn-primary" data-bs-toggle="collapse" href="#b{{ user.id }}" role="button" aria-expanded="false" aria-controls="b{{ user.id }}">
+                <div class="card-header">
+                    <h3>{{ user.username }}: {{ user.sum/100 }} €</h3>
+                </div>
+            </a>
+            <div class="collapse" id="b{{ user.id }}">
+                {% for item_infos in user.item_infos %}
+                <div class="card-body">
+                    <div class="col-sm-1"></div>
+                    <div class="col">
+                        <h4>{{ item_infos.date }}</h4>
+                        {% for item in item_infos.item_list %}
+                            <div class="row">
+                                <div class="col-sm-1"></div>
+                                <div class="col">
+                                    {{ item.amount }}x {{ item.name }} je {{ item.price/100 }} €
                                 </div>
-                            {% endfor %}
-                        </div>
+                            </div>
+                        {% endfor %}
                     </div>
-                {% endif %}
-            {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
         </div>
     {% endfor %}
 {% endblock %}

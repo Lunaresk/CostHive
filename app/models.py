@@ -1,7 +1,5 @@
 from app import db, login
 from flask_login import UserMixin
-from sqlalchemy.sql import text
-from sqlalchemy_utils.view import create_view
 from werkzeug.security import generate_password_hash, check_password_hash
 
 item_category = db.Table("item_category",
@@ -10,11 +8,13 @@ item_category = db.Table("item_category",
 )
 
 class User(UserMixin, db.Model):
-    id = db.Column(db.String(10), primary_key=True)
-    name = db.Column(db.String(64), nullable=False)
+    id = db.Column(db.BigInteger, primary_key=True)
+    email = db.Column(db.String(64), nullable=False, unique=True)
+    username = db.Column(db.String(64), nullable=False, unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
 
-    Bought = db.relationship("Bought", backref='User', lazy='dynamic')
+    # Bought = db.relationship("Bought", backref='User', lazy='dynamic')
+    LoginToken = db.relationship("LoginToken", backref='User', lazy='dynamic')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -23,11 +23,24 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self) -> str:
-        return f"<User {self.id} ({self.name})>"
+        return f"<User {self.id} ({self.username})>"
+
+class Establishment(db.Model):
+    id = db.Column(db.BigInteger, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+
+    LoginToken = db.relationship("LoginToken", backref='Establishment', lazy='dynamic')
+
+    def __repr__(self) -> str:
+        return f"<Establishment {self.id} ({self.name})>"
 
 class LoginToken(db.Model):
     user = db.Column(db.ForeignKey('user.id'), primary_key=True)
-    token = db.Column(db.String(32), nullable=False)
+    establishment = db.Column(db.ForeignKey('establishment.id'), primary_key=True)
+    token = db.Column(db.String(15), nullable=True, unique=True)
+
+    def __repr__(self) -> str:
+        return f"LoginToken {self.token}"
 
 class Brand(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -38,7 +51,7 @@ class Brand(db.Model):
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(32), nullable=False)
+    name = db.Column(db.String(32), nullable=False, unique=True)
 
     Item = db.relationship("Item", secondary=item_category, lazy="dynamic", back_populates="Category")
     
@@ -60,12 +73,12 @@ class Item(db.Model):
         return f"<Item {self.id} ({self.name})>"
 
 class Bought(db.Model):
-    user = db.Column(db.ForeignKey('user.id'), primary_key=True)
+    token = db.Column(db.ForeignKey('login_token.token'), primary_key=True)
     item = db.Column(db.ForeignKey('item.id'), primary_key=True)
     date = db.Column(db.Date, primary_key=True)
     amount = db.Column(db.SmallInteger, nullable=False)
-    # registered = db.Column(db.Boolean, nullable=False, default=False)
-    # paid = db.Column(db.SmallInteger, nullable=False, default=0)
+    registered = db.Column(db.Boolean, nullable=False, default=False)
+    paid = db.Column(db.SmallInteger, nullable=False, default=0)
 
     def __repr__(self) -> str:
         return f"<Bought Object>"
@@ -103,30 +116,6 @@ class ItemReceipt(db.Model):
     def __repr__(self) -> str:
         return f"<ItemReceipt {self.receipt}: {self.item}>"
 
-def query_price_per_amount_view():
-    p = db.aliased(PriceChange, name="p")
-    a = db.aliased(AmountChange, name="a")
-    date = db.func.greatest(p.date, a.date).label("date")
-    price = (db.func.ceil(p.price.cast(db.Float)/db.func.coalesce(a.amount, 1))/100).label("price")
-    select = db.select(p.item.label("item"), date, price)
-    select = select.distinct(p.item, date)
-    select = select.join(a, p.item==a.item, isouter=True)
-    select = select.order_by(p.item, db.desc(db.func.greatest(p.date, a.date)))
-    return select
-
-price_per_amount = create_view("price_per_amount", query_price_per_amount_view(), db.metadata)
-
-def query_bought_with_prices_view():
-    b = db.aliased(Bought, name="b")
-    ppa = price_per_amount.alias("ppa")
-    select = db.select(b.user.label("user"), b.date.label("date"), b.item.label("item"), b.amount.label("amount"), ppa.c.price.label("price"))
-    select = select.distinct(b.user, b.date, b.item)
-    select = select.join(ppa, b.item==ppa.c.item)
-    select = select.where(ppa.c.date<=b.date)
-    select = select.order_by(db.desc(b.user), db.desc(b.date), db.desc(b.item), db.desc(ppa.c.date))
-    return select
-
-bought_with_prices = create_view("bought_with_prices", query_bought_with_prices_view(), db.metadata)
 
 @login.user_loader
 def load_user(id):

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <div class="row">{{form.id.label}}</div>
+    <div class="row">{{form.id()}}</div>
+    <div class="row">{{form.name.label}}</div>
+    <div class="row">{{form.name()}}</div>
+    <div class="row">{{form.description.label}}</div>
+    <div class="row">{{form.description()}}</div>
+    <div class="row">{{form.date.label}}</div>
+    <div class="row">{{form.date()}}</div>
+    <div class="row">{{form.price_change.label}}</div>
+    <div class="row">{{form.price_change()}}</div>
+    <div class="row">{{form.amount_change.label}}</div>
+    <div class="row">{{form.amount_change()}}</div>
+    <div class="row">{{form.category.label}}</div>
+    <div class="row">{{form.category()}}</div>
+    <div class="row">{{form.brand.label}}</div>
+    <div class="row">{{form.brand()}}</div>
+    <div class="row">{{form.submit()}}</div>
+</form>
+{% endblock %}

@@ -1,7 +1,7 @@
 from app.models import Brand, Category
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectMultipleField, DateField, IntegerField, SelectField, FloatField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -15,8 +15,8 @@ class NewItemForm(FlaskForm):
     description = StringField("Description", validators=[DataRequired()])
     date = DateField("Insert Date", validators=[DataRequired()])
     price_change = FloatField("Price", validators=[DataRequired()])
-    amount_change = IntegerField("Amount")
-    category = SelectMultipleField("Categories", choices=[(c.id, c.name) for c in Category.query.order_by("name").all()], validators=[DataRequired()])
+    amount_change = IntegerField("Amount", validators=[Optional()])
+    category = SelectMultipleField("Categories", choices=[(c.id, c.name) for c in Category.query.order_by("name").all()], validators=[Optional()])
     brand = SelectField("Brand", choices=[(b.id, b.name) for b in Brand.query.order_by("name").all()], validators=[DataRequired()])
     submit = SubmitField("Submit")
 
@@ -26,4 +26,11 @@ class NewCategoryForm(FlaskForm):
 
 class NewBrandForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+class NeueWGForm(FlaskForm):
+    wg_name = StringField("Name", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+class WGBeitretenForm(FlaskForm):
     submit = SubmitField("Submit")
