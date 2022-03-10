@@ -1,7 +1,8 @@
 from app import app, db, LOGGER
-from app.forms import NewItemForm, LoginForm
-from app.models import LoginToken, User, Item, Brand, Category, PriceChange, AmountChange
-from app.utils import view_utils, database_utils, routes_utils
+from app.forms import NewItemForm, LoginForm, RegistrationForm
+from app.models import LoginToken, User, Item, Brand, PriceChange, AmountChange
+from app.utils import view_utils, database_utils
+from app.utils.routes_utils import render_custom_template as render_template
 from datetime import date
 from flask import abort, flash, redirect, request, url_for
 from flask.json import jsonify
@@ -10,11 +11,9 @@ from werkzeug.urls import url_parse
 
 APPNAME = "scan2kasse"
 
-render_template = routes_utils.render_custom_template
-
-@app.route('/')
+@app.route(f'/{APPNAME}')
 def index():
-    return "<h1>Hello, World!</h>", 200
+    return render_template("base.html")
 
 @app.route('/test')
 def test():
@@ -22,7 +21,6 @@ def test():
         LOGGER.debug(request.args['testing'])
     form = NewItemForm()
     return render_template("test.html", form=form)
-
 
 @app.route(f'/{APPNAME}/token_authorization')
 def token_authorization():
@@ -32,7 +30,6 @@ def token_authorization():
     if not LoginToken.query.filter_by(token=request.json['login']).first():
         abort(403)
     return jsonify({}), 200
-
 
 @app.route(f'/{APPNAME}/token_insert', methods=['POST'])
 def insert():
@@ -47,6 +44,19 @@ def insert():
         return jsonify(failed), 400
     return jsonify({'inserted': True}), 201
 
+@app.route('/register', methods=['GET', 'POST'])
+def web_register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulations, you are now a registered user!')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Register', form=form)
 
 @app.route(f'/{APPNAME}/login', methods=['GET', 'POST'])
 def web_login():
@@ -65,18 +75,23 @@ def web_login():
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
+@app.route(f'/{APPNAME}/logout')
+def web_logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route(f'/{APPNAME}/newitem', methods=['GET', 'POST'])
 @login_required
 def new_item():
     if current_user.is_anonymous:
         abort(403)
-    form=NewItemForm()
+    form=NewItemForm.new()
     if form.is_submitted():
         LOGGER.debug("submitted")
     if form.validate():
         LOGGER.debug("valid")
-    LOGGER.debug(form.errors)
+    else:
+        LOGGER.debug(form.errors)
     if form.validate_on_submit():
         LOGGER.debug("valid form")
         brand = Brand.query.get(form.brand.data)
@@ -93,7 +108,10 @@ def new_item():
     return render_template('admin/new_item.html', form=form)
 
 @app.route(f'/{APPNAME}/overview', methods=['GET'])
+@login_required
 def get_report_from_user():
+    if current_user.is_anonymous:
+        abort(403)
     if 'month' in request.args:
         try:
             month = int(request.args['month'])
@@ -104,7 +122,7 @@ def get_report_from_user():
             if (month > 12 or month < 1):
                 abort(400)
     LOGGER.info("Getting results.")
-    results = database_utils.get_report(kwargs = request.args)
+    results = database_utils.get_report(**request.args)
     LOGGER.debug(f"Results received: {results}")
     if results:
         result_list = view_utils.group_results(results)

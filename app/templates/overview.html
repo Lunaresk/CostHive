@@ -3,11 +3,11 @@
 {% block content %}
     {% for user in results %}
         <div class="card">
-            <a class="btn btn-primary" data-bs-toggle="collapse" href="#b{{ user.id }}" role="button" aria-expanded="false" aria-controls="b{{ user.id }}">
+            <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#b{{ user.id }}" aria-expanded="true">
                 <div class="card-header">
                     <h3>{{ user.username }}: {{ user.sum/100 }} €</h3>
                 </div>
-            </a>
+            </button>
             <div class="collapse" id="b{{ user.id }}">
                 {% for item_infos in user.item_infos %}
                 <div class="card-body">
