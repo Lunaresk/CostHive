@@ -29,18 +29,6 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
-    op.create_table('establishment',
-    sa.Column('id', sa.BigInteger(), nullable=False),
-    sa.Column('name', sa.String(length=64), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('receipt',
-    sa.Column('id', sa.Numeric(precision=22, scale=0), nullable=False),
-    sa.Column('date', sa.Date(), nullable=False),
-    sa.Column('registered', sa.Boolean(), server_default='False', nullable=False),
-    sa.Column('paid', sa.SmallInteger(), server_default='0', nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('user',
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('email', sa.String(length=64), nullable=False),
@@ -49,6 +37,20 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
+    )
+    op.create_table('establishment',
+    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('name', sa.String(length=64), nullable=False),
+    sa.Column('owner', sa.BigInteger(), nullable=False),
+    sa.ForeignKeyConstraint(['owner'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('receipt',
+    sa.Column('id', sa.Numeric(precision=22, scale=0), nullable=False),
+    sa.Column('date', sa.Date(), nullable=False),
+    sa.Column('registered', sa.Boolean(), server_default='False', nullable=False),
+    sa.Column('paid', sa.SmallInteger(), server_default='0', nullable=False),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('item',
     sa.Column('id', sa.BigInteger(), nullable=False),
