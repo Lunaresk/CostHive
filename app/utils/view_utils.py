@@ -1,8 +1,5 @@
 from app import db, LOGGER
 from app.models import AmountChange, Bought, PriceChange
-from datetime import date
-from flask import render_template
-from flask_login import current_user
 from sqlalchemy_utils import create_view
 
 def group_results(results: tuple) -> list:

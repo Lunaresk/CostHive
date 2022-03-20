@@ -1,5 +1,5 @@
 from app import db, LOGGER
-from app.models import Bought, Item, LoginToken, User
+from app.models import Bought, Establishment, Item, LoginToken, User
 from app.utils.view_utils import bought_with_prices as bwp
 from copy import deepcopy
 from datetime import date as dtdate, timedelta
@@ -37,10 +37,11 @@ def get_report(**kwargs):
             query_select = query_select.filter_by(token == token)
         case {"establishment": establishment}:
             LOGGER.debug("Establishment present")
-            query_select = query_select.filter(
-                bwp.c.token.in_(
-                    # db.session.query(LoginToken.token).filter_by(establishment = int(establishment), user=current_user.id)))
-                    db.session.query(LoginToken.token).filter_by(establishment = int(establishment))))
+            if current_user.id == Establishment.query.get(int(establishment)).owner:
+                _filter = db.session.query(LoginToken.token).filter_by(establishment = int(establishment))
+            else:
+                _filter = db.session.query(LoginToken.token).filter_by(establishment = int(establishment), user=current_user.id)
+            query_select = query_select.filter(bwp.c.token.in_(_filter))
             LOGGER.debug(str(query_select))
     match kwargs:
         case {"month": month}:

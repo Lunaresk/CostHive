@@ -15,13 +15,6 @@ APPNAME = "scan2kasse"
 def index():
     return render_template("base.html")
 
-@app.route('/test')
-def test():
-    if request.args:
-        LOGGER.debug(request.args['testing'])
-    form = NewItemForm()
-    return render_template("test.html", form=form)
-
 @app.route(f'/{APPNAME}/token_authorization')
 def token_authorization():
     LOGGER.debug("Token Login")
@@ -132,3 +125,9 @@ def get_report_from_user():
         return jsonify(result_list)
     else:
         return render_template("overview.html", results=result_list)
+
+@app.route(f'/{APPNAME}/overview/register_boughts', methods=['GET'])
+@login_required
+def check_unregistered_items():
+    if current_user.is_anonymous:
+        abort(403)

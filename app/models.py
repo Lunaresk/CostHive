@@ -29,6 +29,7 @@ class User(UserMixin, db.Model):
 class Establishment(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
+    owner = db.Column(db.ForeignKey('user.id'), nullable=False)
 
     LoginToken = db.relationship("LoginToken", backref='Establishment', lazy='dynamic')
 
