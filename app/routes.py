@@ -1,6 +1,6 @@
 from app import app, db, LOGGER
 from app.forms import NewItemForm, LoginForm, RegistrationForm
-from app.models import LoginToken, User, Item, Brand, PriceChange, AmountChange
+from app.models import Establishment, LoginToken, User, Item, Brand, PriceChange, AmountChange
 from app.utils import view_utils, database_utils
 from app.utils.routes_utils import render_custom_template as render_template
 from datetime import date
@@ -116,7 +116,29 @@ def get_report_from_user():
                 abort(400)
     LOGGER.info("Getting results.")
     results = database_utils.get_report(**request.args)
-    LOGGER.debug(f"Results received: {results}")
+    LOGGER.debug(f"Results received.")
+    # LOGGER.debug(str(results))
+    if results:
+        result_list = view_utils.group_results(results)
+    else:
+        result_list = []
+    if request.content_type == "application/json":
+        return jsonify(result_list)
+    else:
+        if "establishment" in request.args:
+            return render_template("overview.html", results=result_list, establishment = Establishment.query.get(int(request.args['establishment'])))
+        else:
+            return render_template("overview.html", results=result_list)
+
+@app.route(f'/{APPNAME}/overview/register_boughts', methods=['GET'])
+@login_required
+def check_unregistered_items():
+    if current_user.is_anonymous or not request.args or 'establishment' not in request.args:
+        abort(403)
+    establishment = Establishment.query.get(int(request.args['establishment']))
+    if current_user.id != establishment.owner:
+        abort(403)
+    results = database_utils.get_unregistered_and_register(establishment.id)
     if results:
         result_list = view_utils.group_results(results)
     else:
@@ -125,9 +147,3 @@ def get_report_from_user():
         return jsonify(result_list)
     else:
         return render_template("overview.html", results=result_list)
-
-@app.route(f'/{APPNAME}/overview/register_boughts', methods=['GET'])
-@login_required
-def check_unregistered_items():
-    if current_user.is_anonymous:
-        abort(403)

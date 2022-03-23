@@ -6,7 +6,7 @@ from datetime import date as dtdate, timedelta
 from flask_login import current_user
 from psycopg2 import errors
 from random import choice as rndchoice
-from sqlalchemy import text
+from sqlalchemy import and_, text
 from sqlalchemy.dialects.postgresql import insert
 from string import ascii_letters, digits
 
@@ -42,7 +42,7 @@ def get_report(**kwargs):
             else:
                 _filter = db.session.query(LoginToken.token).filter_by(establishment = int(establishment), user=current_user.id)
             query_select = query_select.filter(bwp.c.token.in_(_filter))
-            LOGGER.debug(str(query_select))
+            # LOGGER.debug(str(query_select))
     match kwargs:
         case {"month": month}:
             LOGGER.debug("Month present")
@@ -52,9 +52,29 @@ def get_report(**kwargs):
             LOGGER.debug("Year present")
             query_select = query_select.filter(bwp.c.date.between(dtdate(int(year), 1, 1), dtdate(int(year), 12, 31)))
     query_select = query_select.order_by(bwp.c.token, bwp.c.date, bwp.c.item)
-    LOGGER.debug(str(query_select))
+    # LOGGER.debug(str(query_select))
     results = query_select.all()
     return tuple(results)
+
+def get_unregistered_and_register(intEstablishment: int):
+    LOGGER.debug("Getting unregistered")
+    establishment = Establishment.query.get(intEstablishment)
+    if current_user.id != establishment.owner:
+        LOGGER.debug("!!!Wrong User!!!")
+        return False
+    query_select = db.session.query(bwp.c.token, User.username, bwp.c.date, bwp.c.item, Item.name, bwp.c.amount, bwp.c.price)
+    query_select = query_select.select_from(bwp).join(LoginToken, LoginToken.token==bwp.c.token).join(User, LoginToken.user==User.id)
+    query_select = query_select.join(Item, Item.id==bwp.c.item).join(Bought, and_(Bought.token==bwp.c.token, Bought.item==bwp.c.item, Bought.date==bwp.c.date))
+    query_select = query_select.filter(bwp.c.token.in_(db.session.query(LoginToken.token).filter_by(establishment = intEstablishment)))
+    query_select = query_select.filter(Bought.registered == False)
+    query_select = query_select.order_by(bwp.c.token, bwp.c.date, bwp.c.item)
+    results = query_select.all()
+    unregistered_boughts = establishment.Bought.filter_by(registered = False).all()
+    for x in unregistered_boughts:
+        x.registered = True
+    db.session.commit()
+    return results
+
 
 def generate_token(length = 15, allowed_chars = ascii_letters + digits):
     new_token = "".join((rndchoice(allowed_chars) for i in range(length)))

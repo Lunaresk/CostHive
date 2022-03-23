@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
+    {% if establishment %}
+        {% if current_user.id == establishment.owner %}
+        <button type="button" class="btn btn-outline-dark px-2" data-bs-toggle="button" autocomplete="off" onclick="window.location.href='{{ url_for('check_unregistered_items', establishment=establishment.id) }}'">
+            Abrechnung
+        </button>
+        {% endif %}
+    {% endif %}
     {% for user in results %}
         <div class="card">
             <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#b{{ user.id }}" aria-expanded="true">

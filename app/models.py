@@ -14,8 +14,9 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), nullable=False, unique=True)
     password_hash = db.Column(db.String(128), nullable=False)
 
-    # Bought = db.relationship("Bought", backref='User', lazy='dynamic')
     LoginToken = db.relationship("LoginToken", backref='User', lazy='dynamic')
+    Bought = db.relationship("Bought", secondary="login_token",
+        lazy='dynamic', overlaps="User,LoginToken")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -32,6 +33,8 @@ class Establishment(db.Model):
     owner = db.Column(db.ForeignKey('user.id'), nullable=False)
 
     LoginToken = db.relationship("LoginToken", backref='Establishment', lazy='dynamic')
+    Bought = db.relationship("Bought", secondary="login_token",
+        lazy='dynamic', overlaps="Establishment,LoginToken,Bought")
 
     def __repr__(self) -> str:
         return f"<Establishment {self.id} ({self.name})>"
