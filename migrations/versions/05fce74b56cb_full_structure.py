@@ -31,12 +31,10 @@ def upgrade():
     )
     op.create_table('user',
     sa.Column('id', sa.BigInteger(), nullable=False),
-    sa.Column('email', sa.String(length=64), nullable=False),
-    sa.Column('username', sa.String(length=64), nullable=False),
+    sa.Column('email', sa.String(length=255), nullable=False),
     sa.Column('password_hash', sa.String(length=128), nullable=False),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('username')
+    sa.UniqueConstraint('email')
     )
     op.create_table('establishment',
     sa.Column('id', sa.BigInteger(), nullable=False),
@@ -45,11 +43,22 @@ def upgrade():
     sa.ForeignKeyConstraint(['owner'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('login_token',
+    sa.Column('user', sa.BigInteger(), nullable=False),
+    sa.Column('establishment', sa.BigInteger(), nullable=False),
+    sa.Column('token', sa.String(length=15), nullable=True),
+    sa.Column('paid', sa.BigInteger(), server_default='0', nullable=False),
+    sa.ForeignKeyConstraint(['establishment'], ['establishment.id'], ),
+    sa.ForeignKeyConstraint(['user'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('user', 'establishment'),
+    sa.UniqueConstraint('token')
+    )
     op.create_table('receipt',
     sa.Column('id', sa.Numeric(precision=22, scale=0), nullable=False),
     sa.Column('date', sa.Date(), nullable=False),
+    sa.Column('from_user', sa.String(length=15), nullable=True),
     sa.Column('registered', sa.Boolean(), server_default='False', nullable=False),
-    sa.Column('paid', sa.SmallInteger(), server_default='0', nullable=False),
+    sa.ForeignKeyConstraint(['from_user'], ['login_token.token'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('item',
@@ -59,15 +68,6 @@ def upgrade():
     sa.Column('description', sa.Text(), nullable=False),
     sa.ForeignKeyConstraint(['brand'], ['brand.id'], ),
     sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('login_token',
-    sa.Column('user', sa.BigInteger(), nullable=False),
-    sa.Column('establishment', sa.BigInteger(), nullable=False),
-    sa.Column('token', sa.String(length=15), nullable=True),
-    sa.ForeignKeyConstraint(['establishment'], ['establishment.id'], ),
-    sa.ForeignKeyConstraint(['user'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('user', 'establishment'),
-    sa.UniqueConstraint('token')
     )
     op.create_table('amount_change',
     sa.Column('item', sa.BigInteger(), nullable=False),
@@ -82,7 +82,6 @@ def upgrade():
     sa.Column('date', sa.Date(), nullable=False),
     sa.Column('amount', sa.SmallInteger(), nullable=False),
     sa.Column('registered', sa.Boolean(), server_default='False', nullable=False),
-    sa.Column('paid', sa.SmallInteger(), server_default='0', nullable=False),
     sa.ForeignKeyConstraint(['item'], ['item.id'], ),
     sa.ForeignKeyConstraint(['token'], ['login_token.token'], ),
     sa.PrimaryKeyConstraint('token', 'item', 'date')
@@ -119,11 +118,11 @@ def downgrade():
     op.drop_table('item_category')
     op.drop_table('bought')
     op.drop_table('amount_change')
-    op.drop_table('login_token')
     op.drop_table('item')
-    op.drop_table('user')
     op.drop_table('receipt')
+    op.drop_table('login_token')
     op.drop_table('establishment')
+    op.drop_table('user')
     op.drop_table('category')
     op.drop_table('brand')
     # ### end Alembic commands ###

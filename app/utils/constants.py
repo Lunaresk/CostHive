@@ -1,0 +1,1 @@
+APPNAME = "scan2kasse"

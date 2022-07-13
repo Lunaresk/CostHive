@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block app_content %}
     {% if establishment %}
         {% if current_user.id == establishment.owner %}
         <button type="button" class="btn btn-outline-dark px-2" data-bs-toggle="button" autocomplete="off" onclick="window.location.href='{{ url_for('check_unregistered_items', establishment=establishment.id) }}'">
