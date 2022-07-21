@@ -18,7 +18,7 @@ def web_register():
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.web_login'))
     return render_template('auth/register.html', title='Register', form=form)
 
 @bp.route(f'/login', methods=['GET', 'POST'])
