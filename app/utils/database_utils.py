@@ -29,7 +29,7 @@ def insert_bought_items(token: str, items: dict, date: str = None):
     return {'user':token, 'date': date, 'items': items} if items else {}
 
 def get_report(**kwargs):
-    query_select = db.session.query(bwp.c.token, User.username, bwp.c.date, bwp.c.item, Item.name, bwp.c.amount, bwp.c.price)
+    query_select = db.session.query(bwp.c.token, User.email, bwp.c.date, bwp.c.item, Item.name, bwp.c.amount, bwp.c.price)
     query_select = query_select.select_from(bwp).join(LoginToken, LoginToken.token==bwp.c.token).join(User, LoginToken.user==User.id).join(Item, Item.id==bwp.c.item)
     match kwargs:
         case {"token": token}:
@@ -62,7 +62,7 @@ def get_unregistered_and_register(intEstablishment: int):
     if current_user.id != establishment.owner:
         LOGGER.debug("!!!Wrong User!!!")
         return False
-    query_select = db.session.query(bwp.c.token, User.username, bwp.c.date, bwp.c.item, Item.name, bwp.c.amount, bwp.c.price)
+    query_select = db.session.query(bwp.c.token, User.email, bwp.c.date, bwp.c.item, Item.name, bwp.c.amount, bwp.c.price)
     query_select = query_select.select_from(bwp).join(LoginToken, LoginToken.token==bwp.c.token).join(User, LoginToken.user==User.id)
     query_select = query_select.join(Item, Item.id==bwp.c.item).join(Bought, and_(Bought.token==bwp.c.token, Bought.item==bwp.c.item, Bought.date==bwp.c.date))
     query_select = query_select.filter(bwp.c.token.in_(db.session.query(LoginToken.token).filter_by(establishment = intEstablishment)))

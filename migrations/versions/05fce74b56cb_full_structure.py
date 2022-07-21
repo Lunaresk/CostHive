@@ -54,7 +54,7 @@ def upgrade():
     sa.UniqueConstraint('token')
     )
     op.create_table('receipt',
-    sa.Column('id', sa.Numeric(precision=22, scale=0), nullable=False),
+    sa.Column('id', sa.Numeric(precision=24, scale=0), autoincrement=False, nullable=False),
     sa.Column('date', sa.Date(), nullable=False),
     sa.Column('from_user', sa.String(length=15), nullable=True),
     sa.Column('registered', sa.Boolean(), server_default='False', nullable=False),
@@ -62,7 +62,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('item',
-    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('id', sa.BigInteger(), autoincrement=False, nullable=False),
     sa.Column('name', sa.String(length=64), nullable=False),
     sa.Column('brand', sa.Integer(), nullable=False),
     sa.Column('description', sa.Text(), nullable=False),
@@ -94,7 +94,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('item', 'category')
     )
     op.create_table('item_receipt',
-    sa.Column('receipt', sa.Numeric(precision=22, scale=0), nullable=False),
+    sa.Column('receipt', sa.Numeric(precision=24, scale=0), nullable=False),
     sa.Column('item', sa.BigInteger(), nullable=False),
     sa.Column('amount', sa.SmallInteger(), nullable=False),
     sa.ForeignKeyConstraint(['item'], ['item.id'], ),

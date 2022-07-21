@@ -1,3 +1,0 @@
-SECRET_KEY: "MY_5€cr37_K€Y"
-SQLALCHEMY_DATABASE_URI: "dialect+driver://username:password@host:port/database"
-SQLALCHEMY_TRACK_MODIFICATIONS: False

@@ -44,9 +44,9 @@ def get_report_from_user():
         return jsonify(result_list)
     else:
         if "establishment" in request.args:
-            return render_template("overview.html", results=result_list, establishment = Establishment.query.get(int(request.args['establishment'])))
+            return render_template("main/overview.html", results=result_list, establishment = Establishment.query.get(int(request.args['establishment'])))
         else:
-            return render_template("overview.html", results=result_list)
+            return render_template("main/overview.html", results=result_list)
 
 @bp.route('/token_authorization')
 def token_authorization():
@@ -95,7 +95,7 @@ def new_item():
         db.session.add(new_item)
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('admin/new_item.html', form=form)
+    return render_template('main/new_item.html', form=form)
 
 @bp.route('/overview/register_boughts', methods=['GET'])
 @login_required
@@ -113,4 +113,4 @@ def check_unregistered_items():
     if request.content_type == "application/json":
         return jsonify(result_list)
     else:
-        return render_template("overview.html", results=result_list)
+        return render_template("main/overview.html", results=result_list)

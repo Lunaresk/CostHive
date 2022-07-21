@@ -3,7 +3,7 @@
 {% block app_content %}
     {% if establishment %}
         {% if current_user.id == establishment.owner %}
-        <button type="button" class="btn btn-outline-dark px-2" data-bs-toggle="button" autocomplete="off" onclick="window.location.href='{{ url_for('check_unregistered_items', establishment=establishment.id) }}'">
+        <button type="button" class="btn btn-outline-dark px-2" data-bs-toggle="button" autocomplete="off" onclick="window.location.href='{{ url_for('main.check_unregistered_items', establishment=establishment.id) }}'">
             Abrechnung
         </button>
         {% endif %}
@@ -12,7 +12,7 @@
         <div class="card">
             <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#b{{ user.id }}" aria-expanded="true">
                 <div class="card-header">
-                    <h3>{{ user.username }}: {{ user.sum/100 }} €</h3>
+                    <h3>{{ user.email }}: {{ user.sum/100 }} €</h3>
                 </div>
             </button>
             <div class="collapse" id="b{{ user.id }}">

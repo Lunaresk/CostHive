@@ -24,7 +24,7 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self) -> str:
-        return f"<User {self.id} ({self.username})>"
+        return f"<User {self.id} ({self.email})>"
 
 class Establishment(db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
@@ -64,7 +64,7 @@ class Category(db.Model):
         return f"<Category {self.id} ({self.name})>"
 
 class Item(db.Model):
-    id = db.Column(db.BigInteger, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=False)
     name = db.Column(db.String(64), nullable=False)
     brand = db.Column(db.ForeignKey('brand.id'), nullable=False, server_onupdate=db.FetchedValue())
     description = db.Column(db.Text, nullable=False)
@@ -104,7 +104,7 @@ class AmountChange(db.Model):
         return f"<Amount_Change {self.item} ({self.date})>"
 
 class Receipt(db.Model):
-    id = db.Column(db.Numeric(precision=22, scale=0), primary_key=True)
+    id = db.Column(db.Numeric(precision=24, scale=0), primary_key=True, autoincrement=False)
     date = db.Column(db.Date, nullable=False)
     from_user = db.Column(db.ForeignKey("login_token.token"), server_onupdate=db.FetchedValue())
     registered = db.Column(db.Boolean, nullable=False, server_default=str(False))

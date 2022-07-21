@@ -9,7 +9,7 @@ def group_results(results: tuple) -> list:
         try:
             result_user_index = [result[0] == result_item['id'] for result_item in result_list].index(True)
         except ValueError as e:
-            result_list.append({"id": result[0], "username": result[1], "sum": 0, "item_infos": []})
+            result_list.append({"id": result[0], "email": result[1], "sum": 0, "item_infos": []})
             result_user_index = -1
         result_user = result_list[result_user_index]
         try:
