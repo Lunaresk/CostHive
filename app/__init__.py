@@ -22,12 +22,12 @@ if not exists(DIR + "../logs"):
     makedirs(DIR + "../logs")
 
 fileConfig(DIR + "../configs/log.conf")
-LOGGER = getLogger("root")
+LOGGER = getLogger("main")
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
 login = LoginManager()
-login.login_view = 'web_login'
+login.login_view = 'auth.web_login'
 migrate = Migrate()
 
 

@@ -135,3 +135,4 @@ scans.json
 test.*
 *.db
 .vscode
+*.tar
