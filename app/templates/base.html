@@ -45,9 +45,18 @@
                     <div class="collapse" id="dashboard-collapse">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                             {% if establishments %}
-                                <li><a href="#" class="link-dark rounded">Allgemein</a></li>
+                                <!-- <li><a href="#" class="link-dark rounded">Allgemein</a></li> -->
                                 {% for establishment in establishments %}
-                                    <li><a href="{{ url_for('main.get_report_from_user', establishment=establishment.id) }}" class="link-dark rounded">{{ establishment.name }}</a></li>
+                                    <li>
+                                        <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#est_{{ establishment.id }}" aria-expanded="false">
+                                            {{ establishment.name }}
+                                        </button>
+                                        <div class="collapse" id="est_{{ establishment.id }}">
+                                            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                                                <li><a href="{{ url_for('main.get_report_from_user', establishment=establishment.id) }}" class="link-dark rounded">Übersicht</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
                                 {% endfor %}
                             {% endif %}
                         </ul>

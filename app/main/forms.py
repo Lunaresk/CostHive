@@ -12,7 +12,7 @@ class NewItemForm(FlaskForm):
     amount_change = IntegerField("Amount", validators=[Optional()])
     category = SelectMultipleField("Categories", choices=[], validators=[Optional()])
     brand = SelectField("Brand", choices=[], validators=[DataRequired()])
-    submit = SubmitField("Submit")
+    submit = SubmitField("Submit", render_kw={"class": "btn btn-primary mt-3"})
 
     @classmethod
     def new(cls):

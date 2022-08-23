@@ -8,7 +8,7 @@ from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 
-@bp.route(f'/register', methods=['GET', 'POST'])
+@bp.route('/register', methods=['GET', 'POST'])
 def web_register():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
@@ -22,7 +22,7 @@ def web_register():
         return redirect(url_for('auth.web_login'))
     return render_template('auth/register.html', title='Register', form=form)
 
-@bp.route(f'/login', methods=['GET', 'POST'])
+@bp.route('/login', methods=['GET', 'POST'])
 def web_login():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
@@ -39,7 +39,7 @@ def web_login():
         return redirect(next_page)
     return render_template('auth/login.html', title='Sign In', form=form)
 
-@bp.route(f'/logout')
+@bp.route('/logout')
 def web_logout():
     logout_user()
     return redirect(url_for('main.index'))

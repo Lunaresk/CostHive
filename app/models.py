@@ -58,8 +58,10 @@ class Establishment(db.Model):
 class LoginToken(db.Model):
     user = db.Column(db.ForeignKey('user.id'), primary_key=True, server_onupdate=db.FetchedValue())
     establishment = db.Column(db.ForeignKey('establishment.id'), primary_key=True, server_onupdate=db.FetchedValue())
-    token = db.Column(db.String(15), nullable=True, unique=True)
+    token = db.Column(db.String(15), nullable=False, unique=True)
     paid = db.Column(db.BigInteger, nullable=False, server_default=str(0))
+
+    Receipt = db.relationship("Receipt", backref='LoginToken', lazy='dynamic')
 
     def __repr__(self) -> str:
         return f"LoginToken {self.token}"
@@ -125,6 +127,8 @@ class Receipt(db.Model):
     date = db.Column(db.Date, nullable=False)
     from_user = db.Column(db.ForeignKey("login_token.token"), server_onupdate=db.FetchedValue())
     registered = db.Column(db.Boolean, nullable=False, server_default=str(False))
+
+    ItemReceipt = db.relationship("ItemReceipt", backref='Receipt', lazy='dynamic')
     
     def __repr__(self) -> str:
         return f"<Receipt {self.id}>"

@@ -1,24 +1,17 @@
 {% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
 {% block app_content %}
 <form action="" method="post">
     {{ form.hidden_tag() }}
-    <div class="row">{{form.id.label}}</div>
-    <div class="row">{{form.id()}}</div>
-    <div class="row">{{form.name.label}}</div>
-    <div class="row">{{form.name()}}</div>
-    <div class="row">{{form.description.label}}</div>
-    <div class="row">{{form.description()}}</div>
-    <div class="row">{{form.date.label}}</div>
-    <div class="row">{{form.date()}}</div>
-    <div class="row">{{form.price_change.label}}</div>
-    <div class="row">{{form.price_change()}}</div>
-    <div class="row">{{form.amount_change.label}}</div>
-    <div class="row">{{form.amount_change()}}</div>
-    <div class="row">{{form.category.label}}</div>
-    <div class="row">{{form.category()}}</div>
-    <div class="row">{{form.brand.label}}</div>
-    <div class="row">{{form.brand()}}</div>
-    <div class="row">{{form.submit()}}</div>
+    {{ wtf.form_field(form.id, class=form.id.render_kw["class"] or "form-control mb-3") }}
+    {{ wtf.form_field(form.name, class=form.name.render_kw["class"] or "form-control mb-3") }}
+    {{ wtf.form_field(form.description, class=form.description.render_kw["class"] or "form-control mb-3") }}
+    {{ wtf.form_field(form.date, class=form.date.render_kw["class"] or "form-control mb-3") }}
+    {{ wtf.form_field(form.price_change, class=form.price_change.render_kw["class"] or "form-control mb-3") }}
+    {{ wtf.form_field(form.amount_change, class=form.amount_change.render_kw["class"] or "form-control mb-3") }}
+    {{ wtf.form_field(form.category, class=form.category.render_kw["class"] or "form-control mb-3") }}
+    {{ wtf.form_field(form.brand, class=form.brand.render_kw["class"] or "form-control mb-3") }}
+    {{ wtf.form_field(form.submit, class=form.submit.render_kw["class"] or "btn btn-primary  mt-3") }}
 </form>
 {% endblock %}

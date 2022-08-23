@@ -52,9 +52,12 @@ def get_report_from_user():
 def token_authorization():
     LOGGER.debug("Token Login")
     if not request.json or 'login' not in request.json:
+        LOGGER.debug("JSON not delivered or 'login' not in JSON")
         abort(400)
     if not LoginToken.query.filter_by(token=request.json['login']).first():
+        LOGGER.debug(f"Token <{request.json['login']}> not recognized")
         abort(403)
+    LOGGER.debug("Token accepted")
     return jsonify({}), 200
 
 @bp.route('/token_insert', methods=['POST'])
@@ -94,7 +97,7 @@ def new_item():
             new_item.AmountChange = [AmountChange(Item = new_item, date = date(2021, 12, 1), amount = form.amount_change.data)]
         db.session.add(new_item)
         db.session.commit()
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     return render_template('main/new_item.html', form=form)
 
 @bp.route('/overview/register_boughts', methods=['GET'])
