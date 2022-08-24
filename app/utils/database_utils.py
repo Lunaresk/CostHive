@@ -10,23 +10,26 @@ from sqlalchemy import and_, text
 from sqlalchemy.dialects.postgresql import insert
 from string import ascii_letters, digits
 
-def insert_bought_items(token: str, items: dict, date: str = None):
-    if not date:
-        date = dtdate.today()
-    for item, amount in deepcopy(items).items():
-        query_insert = insert(Bought).values(token=token, item=int(item), date=date, amount=int(amount))
-        query_insert = query_insert.on_conflict_do_update("bought_pkey", set_=dict(amount=text(f'bought.amount + {amount}')))
-        try:
-            db.session.execute(query_insert)
-            db.session.commit()
-        except errors.ForeignKeyViolation as e:
-            db.session.rollback()
-        except Exception as e:
-            db.session.rollback()
-            LOGGER.exception("")
-        else:
-            del(items[item])
-    return {'user':token, 'date': date, 'items': items} if items else {}
+def insert_bought_items(token: str, dates: dict):
+    for date in deepcopy(dates):
+        date_index = dates.index(date)
+        for item in deepcopy(date['items']):
+            query_insert = insert(Bought).values(token=token, item=int(item['item_id']), date=date['date'], amount=int(item["amount"]))
+            query_insert = query_insert.on_conflict_do_update("bought_pkey", set_=dict(amount=text(f'bought.amount + {item["amount"]}')))
+            try:
+                db.session.execute(query_insert)
+                db.session.commit()
+            except errors.ForeignKeyViolation as e:
+                db.session.rollback()
+            except Exception as e:
+                db.session.rollback()
+                LOGGER.exception("")
+            else:
+                item_index = dates[date_index]['items'].index(item)
+                del(dates[date_index]['items'][item_index])
+        if len(dates[date_index]['items']) == 0:
+            del(dates[date_index])
+    return {'user':token, 'dates': date} if date else {}
 
 def get_report(**kwargs):
     query_select = db.session.query(bwp.c.token, User.email, bwp.c.date, bwp.c.item, Item.name, bwp.c.amount, bwp.c.price)
