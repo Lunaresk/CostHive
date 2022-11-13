@@ -3,6 +3,7 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail
 from flask_migrate import Migrate
 from logging import getLogger
 from logging.config import fileConfig
@@ -28,6 +29,7 @@ bootstrap = Bootstrap()
 db = SQLAlchemy()
 login = LoginManager()
 login.login_view = 'auth.web_login'
+mail = Mail()
 migrate = Migrate()
 
 
@@ -37,6 +39,7 @@ def create_app(config_class=Config):
     bootstrap.init_app(app)
     db.init_app(app)
     login.init_app(app)
+    mail.init_app(app)
     migrate.init_app(app, db, render_as_batch=True)
 
     from app.auth import bp as auth_bp

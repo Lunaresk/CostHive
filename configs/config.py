@@ -13,3 +13,9 @@ class Config(object):
         f"@{os.environ.get('DATABASE_HOST', 'localhost')}:{os.environ.get('DATABASE_PORT', '5432')}"
         f"/{os.environ.get('DATABASE_DB', '') or os.environ.get('DATABASE_USER', 'scan2kasse')}")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT'))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    ADMINS = ['postmaster@wpgcommunity.net']

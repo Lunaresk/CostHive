@@ -16,4 +16,8 @@
         </p>
         {{ wtf.form_field(form.submit, class=form.submit.render_kw["class"]) }}
     </form>
+    <p>
+        Forgot Your Password?
+        <a href="{{ url_for('auth.reset_password_request') }}">Click to Reset It</a>
+    </p>
 {% endblock %}
