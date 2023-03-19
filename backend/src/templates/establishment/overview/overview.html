@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+{% if establishment %}
+{% if current_user.id == establishment.owner %}
+<button type="button" class="btn btn-outline-dark px-2" data-bs-toggle="button" autocomplete="off"
+    onclick="window.location.href='{{ url_for('establishment.overview.get_report_from_user', establishment_id=establishment.id) }}'">
+    Abrechnung
+</button>
+{% endif %}
+{% endif %}
+{% for user in results %}
+<div class="card">
+    <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#b{{ user.id }}" aria-expanded="true">
+        <div class="card-header">
+            <h3>{{ user.email }}: {{ user.sum/100 }} €</h3>
+        </div>
+    </button>
+    <div class="collapse" id="b{{ user.id }}">
+        {% for item_infos in user.item_infos %}
+        <div class="card-body">
+            <div class="col-sm-1"></div>
+            <div class="col">
+                <h4>{{ item_infos.date }}</h4>
+                {% for item in item_infos.item_list %}
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col">
+                        {{ item.amount }}x {{ item.name }} je {{ item.price/100 }} €
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

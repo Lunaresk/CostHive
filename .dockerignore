@@ -1,0 +1,9 @@
+# Ignore pycaches
+
+logs
+__pycache__
+.flaskenv
+.env*
+.flaskenv*
+!.env.project
+!.env.vault

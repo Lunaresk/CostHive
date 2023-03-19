@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block app_content %}
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      {% if current_user.is_authenticated %}
+      <th scope="col">Anfrage senden</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for establishment in establishments %}
+    <tr>
+      <th scope="row">{{ establishment.id }}</th>
+      <td>{{ establishment.name }}</td>
+      {% if current_user.is_authenticated %}
+      <td>{% include 'establishment/list/establishment_request.html' %}</td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% include "utils/general/_page_navigation.html" %}
+{% endblock %}

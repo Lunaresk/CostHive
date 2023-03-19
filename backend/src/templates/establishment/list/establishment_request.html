@@ -1,0 +1,11 @@
+<form action="" method="post">
+    {{ form.csrf_token }}
+    {{ form.id(value=establishment.id) }}
+    {% if current_user.EstablishmentCandidate.filter_by(establishment = establishment.id).first() %}
+    {{ form.submit(value="Bereits angefragt", disabled=True) }}
+    {% elif establishment.LoginToken.filter_by(user = current_user.id).first() %}
+    {{ form.submit(value="Bereits Mitglied", disabled=True) }}
+    {% else %}
+    {{ form.submit }}
+    {% endif %}
+</form>

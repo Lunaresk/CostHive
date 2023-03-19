@@ -1,1 +1,1 @@
-# WG_Scan2Kasse
+# CostHive
