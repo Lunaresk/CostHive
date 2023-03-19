@@ -1,0 +1,6 @@
+<form action="" method="post">
+    {{ form.csrf_token }}
+    {{ form.candidate_id(value=candidate.user) }}
+    {{ form.accept }}
+    {{ form.deny }}
+</form>

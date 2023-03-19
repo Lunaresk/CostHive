@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>Register</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_field(form.email, class=form.email.render_kw["class"] or "form-control mb-3") }}
+        {{ wtf.form_field(form.password, class=form.password.render_kw["class"] or "form-control mb-3") }}
+        {{ wtf.form_field(form.password2, class=form.password2.render_kw["class"] or "form-control mb-3") }}
+        {{ wtf.form_field(form.submit, class=form.submit.render_kw["class"] or "btn btn-primary mt-3") }}
+    </form>
+{% endblock %}

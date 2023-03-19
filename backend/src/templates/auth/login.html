@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>Sign In</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        {{ wtf.form_field(form.email, class=form.email.render_kw["class"] or "form-control mb-3") }}
+        {{ wtf.form_field(form.password, class=form.password.render_kw["class"] or "form-control mb-3") }}
+        {{ wtf.form_field(form.remember_me, class=form.remember_me.render_kw["class"] or "mb-3") }}
+        {{ wtf.form_field(form.submit, class=form.submit.render_kw["class"] or "btn btn-primary mt-3") }}
+    </form>
+    <p>
+        Forgot Your Password?
+        <a href="{{ url_for('auth.reset_password_request') }}">Click to Reset It</a>
+    </p>
+{% endblock %}

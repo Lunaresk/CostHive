@@ -1,5 +1,6 @@
 #!/bin/bash
-source venv/bin/activate
+cd backend
+pipenv shell
 while true; do
     flask db upgrade 2be4d1ae5493-1
     if [[ "$?" == "0" ]]; then

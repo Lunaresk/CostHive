@@ -1,27 +1,25 @@
-FROM python@sha256:38000b248a186dcae150fe2f64d23bd44a0730347d1e5e4d1faedd449a9a4913
+FROM python@sha256:53da4973924b6b3da6eb34f98e4e9dffdaf1cc05b468da73c69e3a862c36ee19
+# python:3.10.10-slim-bullseye
+RUN useradd costhive
 
-RUN useradd scan2kasse
+WORKDIR /home/costhive
 
-WORKDIR /home/scan2kasse
-
-RUN apt update && apt upgrade
+RUN apt update && apt -y upgrade
 RUN apt install -y libpq-dev gcc g++
 
-COPY requirements.txt requirements.txt
-RUN python -m venv venv
-RUN venv/bin/pip install -r requirements.txt
-RUN venv/bin/pip install gunicorn
+RUN python -m pip install pipenv
 
-COPY app app
-COPY migrations migrations
-COPY configs configs
-COPY run.py boot.sh ./
+COPY boot.sh ./
 RUN chmod +x boot.sh
+
+COPY backend backend
 
 ENV FLASK_APP run.py
 
-RUN chown -R scan2kasse:scan2kasse ./
-USER scan2kasse
+RUN chown -R costhive:costhive ./
+USER costhive
+
+RUN cd backend && pipenv install && pipenv install gunicorn && cd ..
 
 EXPOSE 5000
 ENTRYPOINT ["./boot.sh"]
