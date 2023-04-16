@@ -2,7 +2,8 @@
 
 logs
 __pycache__
-.flaskenv
+Pipfile*
+
 .env*
 .flaskenv*
 !.env.project

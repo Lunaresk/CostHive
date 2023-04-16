@@ -1,9 +1,5 @@
 from src import db, LOGGER
-from src.models.bought import Bought
-from src.models.establishment import Establishment
-from src.models.item import Item
-from src.models.login_token import LoginToken
-from src.models.user import User
+from src.models import Bought, Establishment, Item, LoginToken, User
 from src.utils.view_utils import bought_with_prices as bwp
 from copy import deepcopy
 from datetime import date as dtdate, timedelta
@@ -15,14 +11,14 @@ from sqlalchemy.dialects.postgresql import insert
 from string import ascii_letters, digits
 
 
-def insert_bought_items(token: str, dates: dict):
+def insert_bought_items(token: str, dates: list[dict[str: any]]):
     for date in deepcopy(dates):
         date_index = dates.index(date)
         for item in deepcopy(date['items']):
             query_insert = insert(Bought).values(token=token, item=int(
                 item['item_id']), date=date['date'], amount=int(item["amount"]))
             query_insert = query_insert.on_conflict_do_update(
-                "bought_pkey", set_=dict(amount=text(f'bought.amount + {item["amount"]}')))
+                "bought_pkey", set_=dict(amount=text(f'bought.amount + {int(item["amount"])}')))
             try:
                 db.session.execute(query_insert)
                 db.session.commit()
@@ -36,27 +32,30 @@ def insert_bought_items(token: str, dates: dict):
                 del (dates[date_index]['items'][item_index])
         if len(dates[date_index]['items']) == 0:
             del (dates[date_index])
-    return {'user': token, 'dates': date} if date else {}
+    return {'token': token, 'dates': dates} if dates else {}
 
 
 def get_report(**kwargs):
     query_select = db.session.query(
         bwp.c.token, User.email, bwp.c.date, bwp.c.item, Item.name, bwp.c.amount, bwp.c.price)
-    query_select = query_select.select_from(bwp).join(LoginToken, LoginToken.token == bwp.c.token).join(
-        User, LoginToken.user == User.id).join(Item, Item.id == bwp.c.item)
+    query_select = query_select.select_from(User).join(LoginToken, LoginToken.user == User.id).join(
+        bwp, LoginToken.token == bwp.c.token, isouter = True).join(Item, Item.id == bwp.c.item, isouter = True)
     match kwargs:
         case {"token": token}:
             LOGGER.debug("Token present")
-            query_select = query_select.filter_by(token == token)
+            query_select = query_select.filter_by(token = token)
         case {"establishment": establishment}:
             LOGGER.debug("Establishment present")
-            if current_user.id == Establishment.query.get(int(establishment)).owner:
-                _filter = db.session.query(LoginToken.token).filter_by(
-                    establishment=int(establishment))
-            else:
-                _filter = db.session.query(LoginToken.token).filter_by(
-                    establishment=int(establishment), user=current_user.id)
-            query_select = query_select.filter(bwp.c.token.in_(_filter))
+            query_select = query_select.filter(LoginToken.establishment == establishment)
+            if current_user.id != Establishment.query.get(int(establishment)).owner:
+                query_select = query_select.filter(User.id == current_user.id)
+            # if current_user.id == Establishment.query.get(int(establishment)).owner:
+            #     _filter = db.session.query(LoginToken.token).filter_by(
+            #         establishment=int(establishment))
+            # else:
+            #     _filter = db.session.query(LoginToken.token).filter_by(
+            #         establishment=int(establishment), user=current_user.id)
+            # query_select = query_select.filter(bwp.c.token.in_(_filter))
             # LOGGER.debug(str(query_select))
     match kwargs:
         case {"month": month}:
@@ -69,7 +68,7 @@ def get_report(**kwargs):
             query_select = query_select.filter(bwp.c.date.between(
                 dtdate(int(year), 1, 1), dtdate(int(year), 12, 31)))
     query_select = query_select.order_by(bwp.c.token, bwp.c.date, bwp.c.item)
-    # LOGGER.debug(str(query_select))
+    LOGGER.debug(str(query_select))
     results = query_select.all()
     return tuple(results)
 

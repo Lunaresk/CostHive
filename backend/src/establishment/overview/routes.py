@@ -25,11 +25,12 @@ def get_report_from_user(establishment_id):
     LOGGER.info("Getting results.")
     results = database_utils.get_report(**request.args, **{"establishment": establishment_id})
     LOGGER.debug(f"Results received.")
-    # LOGGER.debug(str(results))
+    LOGGER.debug(str(results))
     if results:
         result_list = view_utils.group_results(results)
     else:
         result_list = []
+    LOGGER.debug(result_list)
     if request.content_type == "application/json":
         return jsonify(result_list)
     else:

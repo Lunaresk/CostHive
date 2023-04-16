@@ -11,4 +11,4 @@ from src.models.payment import Payment
 from src.models.price_change import PriceChange
 from src.models.receipt_item import ReceiptItem
 from src.models.receipt import Receipt
-from src.models.user import User
+from src.models.user import User, UserSchema

@@ -9,7 +9,7 @@ def group_results(results: tuple) -> list:
     LOGGER.debug("Grouping...")
     for result in results:
         try:
-            result_user_index = [result[0] == result_item['id'] for result_item in result_list].index(True)
+            result_user_index = [result[1] == result_item['email'] for result_item in result_list].index(True)
         except ValueError as e:
             result_list.append({"id": result[0], "email": result[1], "sum": 0, "item_infos": []})
             result_user_index = -1
@@ -22,9 +22,10 @@ def group_results(results: tuple) -> list:
         result_date = result_user['item_infos'][result_date_index]
         result_date['item_list'].append({'id': result[3], 'name': result[4], 'amount': result[5], 'price': result[6]})
     for result_user in result_list:
-        for result_date in result_user['item_infos']:
-            for result_item in result_date['item_list']:
-                result_user['sum'] += result_item['amount'] * result_item['price']
+        if result_user.get('id'):
+            for result_date in result_user['item_infos']:
+                for result_item in result_date['item_list']:
+                    result_user['sum'] += result_item['amount'] * result_item['price']
     LOGGER.debug("Grouped.")
     return result_list
 

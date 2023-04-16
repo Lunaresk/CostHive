@@ -2,6 +2,7 @@ import jwt
 from src import db, login
 from flask import current_app
 from flask_login import UserMixin
+from marshmallow import Schema, fields
 from time import time
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -39,6 +40,10 @@ class User(UserMixin, db.Model):
     def __repr__(self) -> str:
         return f"<User {self.id} ({self.email})>"
 
+class UserSchema(Schema):
+    id = fields.Number()
+    email = fields.Str()
+    password_hash = fields.Str()
 
 @login.user_loader
 def load_user(id):

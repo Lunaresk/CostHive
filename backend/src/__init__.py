@@ -1,10 +1,11 @@
 from configs.config import Config
 from flask import Flask
 from flask_bootstrap import Bootstrap
+from flask_cors import CORS
 from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from logging import getLogger
 from logging.config import fileConfig
 from os import makedirs
@@ -26,6 +27,7 @@ fileConfig(DIR + "../configs/log.conf")
 LOGGER = getLogger("main")
 
 bootstrap = Bootstrap()
+cors = CORS()
 db = SQLAlchemy()
 login = LoginManager()
 login.login_view = 'auth.web_login'
@@ -37,6 +39,7 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
     bootstrap.init_app(app)
+    cors.init_app(app)
     db.init_app(app)
     login.init_app(app)
     mail.init_app(app)

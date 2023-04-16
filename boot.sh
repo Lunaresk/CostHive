@@ -1,10 +1,14 @@
 #!/bin/bash
+source venv/bin/activate
 cd backend
-pipenv shell
-while true; do
+for i in {0..5}
+do
     flask db upgrade 2be4d1ae5493-1
     if [[ "$?" == "0" ]]; then
         break
+    elif [ "$i" -eq 5 ]; then
+        echo Deployment failed, exiting...
+        exit 1
     fi
     echo Deploy command failed, retrying in 5 secs...
     sleep 5

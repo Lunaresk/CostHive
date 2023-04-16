@@ -17,6 +17,7 @@ pyjwt = "*"
 python-dotenv = "*"
 pymupdf = "*"
 sqlalchemy-utils = "*"
+marshmallow = "*"
 
 [dev-packages]
 
