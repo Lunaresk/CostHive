@@ -1,5 +1,4 @@
-from src.models.brand import Brand
-from src.models.category import Category
+from src.models import Brand, Category
 from flask_wtf import FlaskForm
 from wtforms import DateField, FloatField, IntegerField, SelectField, SelectMultipleField, StringField, SubmitField
 from wtforms.validators import DataRequired, Optional

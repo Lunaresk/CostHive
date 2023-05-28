@@ -4,8 +4,8 @@
 {% if establishment %}
 {% if current_user.id == establishment.owner %}
 <button type="button" class="btn btn-outline-dark px-2" data-bs-toggle="button" autocomplete="off"
-    onclick="window.location.href='{{ url_for('establishment.overview.get_report_from_user', establishment_id=establishment.id) }}'">
-    Abrechnung
+    onclick="window.location.href='{{ url_for('establishment.payment.insert_payment', establishment_id=establishment.id) }}'">
+    Zahlung hinzufügen
 </button>
 {% endif %}
 {% endif %}

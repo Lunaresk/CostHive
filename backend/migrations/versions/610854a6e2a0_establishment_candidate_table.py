@@ -26,7 +26,7 @@ def upgrade():
     sa.PrimaryKeyConstraint('user', 'establishment')
     )
     op.create_table('payment',
-    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('id', sa.BigInteger(), nullable=False, autoincrement=True),
     sa.Column('token', sa.String(length=15), nullable=False),
     sa.Column('date', sa.Date(), server_default=sa.text('now()'), nullable=False),
     sa.Column('amount', sa.BigInteger(), server_default='0', nullable=False),

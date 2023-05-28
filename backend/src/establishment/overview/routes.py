@@ -7,10 +7,10 @@ from src.models import Establishment
 from src.utils import view_utils, database_utils
 from src.utils.routes_utils import render_custom_template as render_template
 
-@bp.route('/<establishment_id>', methods=['GET'])
+@bp.route('/<int:establishment_id>', methods=['GET'])
 @login_required
 def get_report_from_user(establishment_id):
-    establishment = Establishment.query.filter_by(id=int(establishment_id)).first_or_404()
+    Establishment.query.filter_by(id=int(establishment_id)).first_or_404()
     if current_user.is_anonymous:
         abort(403)
     if 'month' in request.args:

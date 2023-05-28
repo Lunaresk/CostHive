@@ -1,0 +1,8 @@
+{% from 'utils/form/_render_field.html' import render_field %}
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.token) }}
+    {{ render_field(form.date) }}
+    {{ render_field(form.amount) }}
+    {{ form.submit }}
+</form>

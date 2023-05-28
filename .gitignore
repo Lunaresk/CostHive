@@ -348,3 +348,4 @@ test.*
 .flaskenv*
 !.env.project
 !.env.vault
+*.ps1

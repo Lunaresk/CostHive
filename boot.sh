@@ -1,6 +1,8 @@
 #!/bin/bash
+echo "Activating venv"
 source venv/bin/activate
 cd backend
+echo "Upgrading database"
 for i in {0..5}
 do
     flask db upgrade 2be4d1ae5493-1
