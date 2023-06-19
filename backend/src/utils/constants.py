@@ -1,1 +1,1 @@
-APPNAME = "scan2kasse"
+APPNAME = "CostHive"

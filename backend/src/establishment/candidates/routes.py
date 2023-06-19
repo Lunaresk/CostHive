@@ -1,8 +1,8 @@
 from flask import abort, redirect, url_for
 from flask_login import current_user, login_required
+from . import bp
+from .forms import EvaluateCandidateForm
 from src import db, LOGGER
-from src.establishment.candidates import bp
-from src.establishment.candidates.forms import EvaluateCandidateForm
 from src.models import Establishment, EstablishmentCandidate, LoginToken, User
 from src.utils.routes_utils import render_custom_template as render_template
 from src.utils.database_utils import generate_token

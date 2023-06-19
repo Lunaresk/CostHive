@@ -1,7 +1,7 @@
 from src import db
-from src.auth import bp
-from src.auth.email import send_password_reset_email
-from src.auth.forms import LoginForm, RegistrationForm, ResetPasswordForm, ResetPasswordRequestForm
+from . import bp
+from .email import send_password_reset_email
+from .forms import LoginForm, RegistrationForm, ResetPasswordForm, ResetPasswordRequestForm
 from src.models.user import User
 from src.utils.routes_utils import render_custom_template as render_template
 from flask import flash, redirect, request, url_for

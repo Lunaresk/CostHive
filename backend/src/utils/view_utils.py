@@ -1,8 +1,8 @@
+from sqlalchemy_utils import create_view
 from src import db, LOGGER
 from src.models.amount_change import AmountChange
 from src.models.bought import Bought
 from src.models.price_change import PriceChange
-from sqlalchemy_utils import create_view
 
 def group_results(results: tuple) -> list:
     result_list = []

@@ -1,12 +1,12 @@
+from flask import abort, request, url_for
+from flask_login import current_user, login_required
+from . import bp
+from .forms import CheckItemsForm, UploadReceiptForm
 from src import db, LOGGER
 from src.models.receipt import Receipt
 from src.models.login_token import LoginToken
-from src.receipts import bp
-from src.receipts.forms import CheckItemsForm, UploadReceiptForm
 from src.utils.pdf_receipt_parser import PDFReceipt
 from src.utils.routes_utils import render_custom_template as render_template
-from flask import abort, request, url_for
-from flask_login import current_user, login_required
 
 PDFDir = "./"
 

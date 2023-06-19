@@ -1,8 +1,8 @@
 from flask import abort,  request
 from flask.json import jsonify
 from flask_login import current_user, login_required
+from . import bp
 from src import LOGGER
-from src.establishment.overview import bp
 from src.models import Establishment
 from src.utils import view_utils, database_utils
 from src.utils.routes_utils import render_custom_template as render_template

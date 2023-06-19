@@ -1,5 +1,5 @@
-from datetime import datetime
 import fitz
+from datetime import datetime
 from re import search
 
 class PDFReceipt:

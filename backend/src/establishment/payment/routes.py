@@ -1,8 +1,8 @@
 from flask import abort, redirect, url_for
 from flask_login import current_user, login_required
+from . import bp
+from .forms import NewPaymentForm
 from src import db, LOGGER
-from src.establishment.payment import bp
-from src.establishment.payment.forms import NewPaymentForm
 from src.models import Establishment, Payment
 from src.utils.routes_utils import render_custom_template as render_template
 

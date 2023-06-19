@@ -4,6 +4,7 @@ from flask_bootstrap import Bootstrap
 from flask_cors import CORS
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from logging import getLogger
@@ -31,6 +32,7 @@ cors = CORS()
 db = SQLAlchemy()
 login = LoginManager()
 login.login_view = 'auth.web_login'
+ma = Marshmallow()
 mail = Mail()
 migrate = Migrate()
 
@@ -42,6 +44,7 @@ def create_app(config_class=Config):
     cors.init_app(app)
     db.init_app(app)
     login.init_app(app)
+    ma.init_app(app)
     mail.init_app(app)
     migrate.init_app(app, db, render_as_batch=True)
 

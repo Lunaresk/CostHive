@@ -1,10 +1,10 @@
 from datetime import date
 from flask import abort, redirect, url_for
 from flask_login import current_user, login_required
+from . import bp
+from .forms import NewItemForm
 from src import db, LOGGER
 from src.models import AmountChange, Brand, Item, PriceChange
-from src.item.new import bp
-from src.item.new.forms import NewItemForm
 from src.utils.routes_utils import render_custom_template as render_template
 
 @bp.route('/new_item', methods=['GET', 'POST'])

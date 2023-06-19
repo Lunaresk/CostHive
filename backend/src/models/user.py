@@ -1,10 +1,10 @@
 import jwt
-from src import db, login
 from flask import current_app
 from flask_login import UserMixin
-from marshmallow import Schema, fields
+from src import db, login
 from time import time
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.BigInteger, primary_key=True)
@@ -13,9 +13,11 @@ class User(UserMixin, db.Model):
 
     LoginToken = db.relationship("LoginToken", backref='User', lazy='dynamic')
     Bought = db.relationship("Bought", secondary="login_token",
-        lazy='dynamic', overlaps="User,LoginToken")
-    EstablishmentCandidate = db.relationship("EstablishmentCandidate", backref='User', lazy='dynamic')
-    Establishment = db.relationship("Establishment", backref="User", lazy="dynamic")
+                             lazy='dynamic', overlaps="User,LoginToken")
+    EstablishmentCandidate = db.relationship(
+        "EstablishmentCandidate", backref='User', lazy='dynamic')
+    Establishment = db.relationship(
+        "Establishment", backref="User", lazy="dynamic")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -40,10 +42,6 @@ class User(UserMixin, db.Model):
     def __repr__(self) -> str:
         return f"<User {self.id} ({self.email})>"
 
-class UserSchema(Schema):
-    id = fields.Number()
-    email = fields.Str()
-    password_hash = fields.Str()
 
 @login.user_loader
 def load_user(id):

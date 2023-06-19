@@ -23,5 +23,8 @@
     {% endfor %}
   </tbody>
 </table>
+
+{% with pagination_object=establishments %}
 {% include "utils/general/_page_navigation.html" %}
+{% endwith %}
 {% endblock %}
