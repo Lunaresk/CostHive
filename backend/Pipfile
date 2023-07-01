@@ -19,6 +19,7 @@ pymupdf = "*"
 sqlalchemy-utils = "*"
 flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
+requests = "*"
 
 [dev-packages]
 

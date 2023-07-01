@@ -1,0 +1,1 @@
+from .flatastic import Flatastic
