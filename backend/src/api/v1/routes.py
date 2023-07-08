@@ -1,6 +1,6 @@
 from src import LOGGER
 from src.api.v1 import bp
-from src.models.login_token import LoginToken
+from models.login_token import LoginToken
 from src.utils import database_utils
 from flask import abort, request
 from flask.json import jsonify

@@ -1,4 +1,4 @@
-from src.models import LoginToken
+from models import LoginToken
 from flask_wtf import FlaskForm
 from wtforms import DateField, FloatField, IntegerField, SelectField, SelectMultipleField, StringField, SubmitField
 from wtforms.validators import DataRequired, Optional

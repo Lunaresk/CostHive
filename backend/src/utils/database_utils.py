@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import insert
 from string import ascii_letters, digits
 from .view_utils import bought_with_prices as bwp
 from src import db, LOGGER
-from src.models import Bought, Establishment, Item, LoginToken, User
+from models import Bought, Establishment, Item, LoginToken, User
 
 
 def insert_bought_items(token: str, dates: list[dict[str: any]]):

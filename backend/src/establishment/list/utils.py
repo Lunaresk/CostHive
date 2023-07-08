@@ -1,5 +1,5 @@
 from flask_login import current_user
-from src.models import Establishment
+from models import Establishment
 
 
 def backend_validation(join_establishment_form):

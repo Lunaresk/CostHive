@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+
+<table class="table">
+    <tbody>
+        <tr>
+            <th scope="row">EAN</th>
+            <th scope="row" class="w-75">{{ item.id }}</th>
+        </tr>
+        <tr>
+            <td>Marke</td>
+            <td>{{ item.Brand.name }}</td>
+        </tr>
+        <tr>
+            <td>Bezeichnung auf dem Kassenzettel</td>
+            <td>{{ item.name }}</td>
+        </tr>
+        <tr>
+            <td>Beschreibung</td>
+            <td>{{ item.description }}</td>
+        </tr>
+        <tr>
+            <td>
+                {% if item.PriceChange %}
+                Momentaner Preis pro Scan</td>
+            <td>€
+                {% if item.AmountChange %}
+                {{ ((item.PriceChange[0].price / item.AmountChange[0].amount)/100)|round(2, 'ceil') }}
+                {% else %}
+                {{ (item.PriceChange[0].price)/100 }}
+                {% endif %}
+                {% else %}
+                Kein Preis vorhanden.
+                {% endif %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+<br>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Preishistorie</th>
+            <td class="w-75">
+                <a href="{{ url_for('item.update.price_change.price_change', item = item.id) }}">Einfügen</a>
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for price in item.PriceChange %}
+        <tr>
+            <td>{{ price.date }}</td>
+            <td>€ {{ price.price/100 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<br>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Mengenhistorie</th>
+            <td class="w-75">
+                <a href="{{ url_for('item.update.amount_change.amount_change', item = item.id) }}">Einfügen</a>
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for amount in item.AmountChange %}
+        <tr>
+            <td>{{ amount.date }}</td>
+            <td>{{ amount.amount }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
