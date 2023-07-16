@@ -10,5 +10,6 @@ class ReceiptSchema(ma.SQLAlchemySchema):
 
     id = ma.auto_field()
     date = ma.auto_field()
-    LoginToken = ma.Nested(LoginTokenSchema)
+    bonid = ma.auto_field()
     registered = ma.auto_field()
+    LoginToken = ma.Nested(LoginTokenSchema)
