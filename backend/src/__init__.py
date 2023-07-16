@@ -38,7 +38,7 @@ migrate = Migrate()
 
 
 def create_app(config_class=Config):
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder="../web/templates", static_folder="../web/static")
     app.config.from_object(config_class)
     bootstrap.init_app(app)
     cors.init_app(app)
@@ -65,4 +65,4 @@ def create_app(config_class=Config):
     
     return app
 
-from src.models import *
+from models import *

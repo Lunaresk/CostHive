@@ -5,8 +5,8 @@ from . import bp
 from .forms import JoinEstablishmentForm
 from .utils import backend_validation
 from src import db
-from src.models import Establishment
-from src.models import EstablishmentCandidate
+from models import Establishment
+from models import EstablishmentCandidate
 from src.utils.routes_utils import render_custom_template as render_template
 
 

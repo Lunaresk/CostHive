@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+{% include 'item/update/_item_to_change.html' ignore missing %}
+{% include 'item/update/amount_change/amount_change_form.html' %}
+{% endblock %}

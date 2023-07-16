@@ -1,7 +1,7 @@
 from . import bp
 from .forms import NewEstablishmentForm
 from src import db, LOGGER
-from src.models import Establishment, LoginToken
+from models import Establishment, LoginToken
 from src.utils import database_utils
 from src.utils.routes_utils import render_custom_template as render_template
 from flask import redirect, url_for

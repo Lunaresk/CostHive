@@ -1,8 +1,8 @@
 from flask import abort, current_app, request
 from flask_login import current_user, login_required
 from . import bp
-from src.models import Item
-from src.models.schemas import ItemSchema
+from models import Item
+from models.schemas import ItemSchema
 from src.utils.routes_utils import render_custom_template as render_template
 
 @bp.route('/show_items', methods=['GET', 'POST'])

@@ -1,23 +1,26 @@
-FROM python@sha256:075fe10ae13ea0f081540bead850eeb7b6c71d07ed4766d75f8529abd0101c44
-# python:3.10.10-slim-bullseye
+FROM python@sha256:21c9f0b22213295a13bd678c5b45aa587ff6cb01cd99b6cf0e6928f4c777006b
+# python:3.11.4-slim-bullseye (arm/v7)
 RUN useradd costhive
 
 WORKDIR /home/costhive
 
-RUN apt update && apt -y upgrade
-RUN apt install -y libpq-dev gcc g++ swig make
+RUN apt update && apt -y upgrade; \
+    apt install -y libpq-dev gcc g++ swig make; \
+    rm -rf /var/lib/apt/lists
 
 COPY boot.sh requirements.txt ./
-RUN python -m venv venv
-RUN venv/bin/pip install -r requirements.txt
-RUN venv/bin/pip install gunicorn
-RUN chmod +x boot.sh
+RUN python -m venv venv; \
+    venv/bin/pip install --upgrade pip; \
+    venv/bin/pip install wheel; \
+    venv/bin/pip install gunicorn; \
+    venv/bin/pip install -r requirements.txt
 
 COPY backend backend
 
 ENV FLASK_APP run.py
 
-RUN chown -R costhive:costhive ./
+RUN chmod +x boot.sh; \
+    chown -R costhive:costhive ./
 
 USER costhive
 
