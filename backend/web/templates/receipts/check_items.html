@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% from 'utils/form/_render_field.html' import render_field %}
+
+{% block app_content %}
+<form action="" method="post" novalidate enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    {% for item in form.items %}
+    <h4>{{ item.requesting() }} {{ item.data.itemname }} (€{{ item.data.price }})</h4>
+    {{ render_field(item.itemname) }}
+    {{ render_field(item.price) }}
+    <div class="{{ item.new_or_existing.id }}" style="display: none;">
+    {{ render_field(item.new_or_existing) }}
+    </div>
+    <div class="{{ item.id }}_new" style="display: none;">
+        {{ render_field(item.new_description) }}
+        {{ render_field(item.new_amount_change) }}
+        {{ render_field(item.new_brand) }}
+    </div>
+    <div class="{{ item.id }}_existing" style="display: none;">
+        {{ render_field(item.existing_item) }}
+    </div>
+
+    <br>
+    {% endfor %}
+    {{ form.submit() }}
+</form>
+{% endblock %}
+
+
+{% block scripts %}
+    {{ super() }}
+    {% for item in form.items %}
+    <script>
+        $(document).ready(function () {
+            $("#{{ item.requesting.id }}").change(function () {
+                if ($(this).prop("checked")) {
+                    $(".{{ item.new_or_existing.id }}").show();
+                    if ($("#{{ item.new_or_existing.id }}-0").prop("checked")) {
+                        $(".{{ item.id }}_new").show();
+                    }
+                    if ($("#{{ item.new_or_existing.id }}-1").prop("checked")) {
+                        $(".{{ item.id }}_existing").show();
+                    }
+                }
+                else {
+                    $(".{{ item.new_or_existing.id }}").hide();
+                    $(".{{ item.id }}_new").hide();
+                    $(".{{ item.id }}_existing").hide();
+                }
+            });
+            $("#{{ item.new_or_existing.id }}-0").change(function () {
+                if ($(this).prop("checked")) {
+                    $(".{{ item.id }}_new").show();
+                    $(".{{ item.id }}_existing").hide();
+                }
+            });
+            $("#{{ item.new_or_existing.id }}-1").change(function () {
+                if ($(this).prop("checked")) {
+                    $(".{{ item.id }}_new").hide();
+                    $(".{{ item.id }}_existing").show();
+                }
+            });
+        });
+    </script>
+    {% endfor %}
+{% endblock %}

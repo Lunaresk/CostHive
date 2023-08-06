@@ -1,11 +1,13 @@
+{% from 'utils/form/_render_radio_button.html' import render_field as render_radio   %}
+{% from 'utils/form/_render_generic_field.html' import render_field as render_generic   %}
+{% from 'utils/form/_render_hidden_field.html' import render_field as render_hidden   %}
+
 {% macro render_field(field) %}
-<div class="form-group">
-  {{ field.label }} {{ field(**kwargs)|safe }} {% if field.errors %}
-  <ul class="errors">
-    {% for error in field.errors %}
-    <li>{{ error }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-</div>
+{% if field.__class__.__name__ == "RadioField" %}
+{{ render_radio(field) }}
+{% elif field.__class__.__name__ == "HiddenField" %}
+{{ render_hidden(field) }}
+{% else %}
+{{ render_generic(field)}}
+{% endif %}
 {% endmacro %}

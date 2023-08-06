@@ -21,6 +21,7 @@ python-dotenv = "*"
 pymupdf = "*"
 requests = "*"
 sqlalchemy-utils = "*"
+wtforms-sqlalchemy = "*"
 
 [dev-packages]
 

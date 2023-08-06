@@ -9,3 +9,6 @@ class Brand(db.Model):
 
     def __repr__(self) -> str:
         return f"<Brand {self.id} ({self.name})>"
+
+    def __str__(self) -> str:
+        return f"{self.name}"

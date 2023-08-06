@@ -339,6 +339,7 @@ pip-selfcheck.json
 # Misc
 config.yaml
 scans.json
+test_*.*
 test.*
 *.db
 .vscode
@@ -349,3 +350,4 @@ test.*
 !.env.project
 !.env.vault
 *.ps1
+*.pdf

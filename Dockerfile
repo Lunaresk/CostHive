@@ -5,14 +5,13 @@ RUN useradd costhive
 WORKDIR /home/costhive
 
 RUN apt update && apt -y upgrade; \
-    apt install -y libpq-dev gcc g++ swig make; \
+    apt install -y libpq-dev gcc g++ swig make cmake m4; \
     rm -rf /var/lib/apt/lists
 
-COPY boot.sh requirements.txt ./
+COPY boot.sh backend/requirements.txt ./
 RUN python -m venv venv; \
     venv/bin/pip install --upgrade pip; \
-    venv/bin/pip install wheel; \
-    venv/bin/pip install gunicorn; \
+    venv/bin/pip install wheel gunicorn; \
     venv/bin/pip install -r requirements.txt
 
 COPY backend backend
@@ -20,7 +19,7 @@ COPY backend backend
 ENV FLASK_APP run.py
 
 RUN chmod +x boot.sh; \
-    chown -R costhive:costhive ./
+    chown -R costhive:costhive .
 
 USER costhive
 
