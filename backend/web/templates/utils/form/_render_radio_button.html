@@ -2,15 +2,10 @@
 {% for choice in field.choices %}
 <div class="form-check form-check-inline">
   <input class="{{ field.render_kw['class'] }}" type="radio" name="{{ field.id }}" id="{{ field.id }}-{{ choice[0] }}"
-    value="{{ choice[0] }}">
+    value="{{ choice[0] }}" {% if field.default == choice[0] %} checked {% endif %}>
   <label class="form-check-label" for="{{ field.id }}-{{ choice[0] }}">{{ choice[1] }}</label>
 </div>
 {% endfor %}
-{% if field.errors %}
-<ul class="errors">
-  {% for error in field.errors %}
-  <li>{{ error }}</li>
-  {% endfor %}
-</ul>
-{% endif %}
+{# {{ field(**kwargs)|safe }} {{ field.label }} #}
+{% include "utils/form/_render_field_errors.html" %}
 {% endmacro %}

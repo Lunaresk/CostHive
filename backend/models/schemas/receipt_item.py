@@ -10,6 +10,5 @@ class ReceiptItemSchema(ma.SQLAlchemySchema):
         include_fk = True
 
     Receipt = ma.Nested(ReceiptSchema)
-    Item = ma.Nested(ItemSchema)
+    price = ma.auto_field()
     amount = ma.auto_field()
-    accepted = ma.auto_field()

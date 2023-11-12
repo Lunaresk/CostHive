@@ -13,6 +13,7 @@
     {{ render_field(item.new_or_existing) }}
     </div>
     <div class="{{ item.id }}_new" style="display: none;">
+        {{ render_field(item.new_ean) }}
         {{ render_field(item.new_description) }}
         {{ render_field(item.new_amount_change) }}
         {{ render_field(item.new_brand) }}
@@ -36,10 +37,10 @@
             $("#{{ item.requesting.id }}").change(function () {
                 if ($(this).prop("checked")) {
                     $(".{{ item.new_or_existing.id }}").show();
-                    if ($("#{{ item.new_or_existing.id }}-0").prop("checked")) {
+                    if ($("#{{ item.new_or_existing.id }}-1").prop("checked")) {
                         $(".{{ item.id }}_new").show();
                     }
-                    if ($("#{{ item.new_or_existing.id }}-1").prop("checked")) {
+                    if ($("#{{ item.new_or_existing.id }}-2").prop("checked")) {
                         $(".{{ item.id }}_existing").show();
                     }
                 }
@@ -49,16 +50,22 @@
                     $(".{{ item.id }}_existing").hide();
                 }
             });
-            $("#{{ item.new_or_existing.id }}-0").change(function () {
+            $("#{{ item.new_or_existing.id }}-1").change(function () {
                 if ($(this).prop("checked")) {
                     $(".{{ item.id }}_new").show();
                     $(".{{ item.id }}_existing").hide();
                 }
             });
-            $("#{{ item.new_or_existing.id }}-1").change(function () {
+            $("#{{ item.new_or_existing.id }}-2").change(function () {
                 if ($(this).prop("checked")) {
                     $(".{{ item.id }}_new").hide();
                     $(".{{ item.id }}_existing").show();
+                }
+            });
+            $("#{{ item.new_or_existing.id }}-3").change(function () {
+                if ($(this).prop("checked")) {
+                    $(".{{ item.id }}_new").hide();
+                    $(".{{ item.id }}_existing").hide();
                 }
             });
         });

@@ -1,4 +1,4 @@
-from flask import abort, redirect, url_for
+from flask import abort, current_app, redirect, request, url_for
 from flask_login import current_user, login_required
 from . import bp
 from .forms import EvaluateCandidateForm
@@ -12,8 +12,10 @@ from src.utils.database_utils import generate_token
 def candidates(establishment_id):
     establishment = Establishment.query.get_or_404(establishment_id)
     if(current_user == establishment.User):
+        page = request.args.get('page', 1, type=int)
         form = EvaluateCandidateForm()
-        establishment_candidates = EstablishmentCandidate.query.filter_by(establishment = establishment.id).all()
+        establishment_candidates = EstablishmentCandidate.query.filter_by(establishment = establishment.id).order_by(EstablishmentCandidate.user.asc()).paginate(
+        page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False)
         if(form.validate_on_submit()):
             if(form.accept.data):
                 login_token = LoginToken(Establishment = establishment, User = User.query.get(form.candidate_id.data), token = generate_token())

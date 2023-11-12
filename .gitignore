@@ -341,6 +341,7 @@ config.yaml
 scans.json
 test_*.*
 test.*
+tests*
 *.db
 .vscode
 *.tar
@@ -351,3 +352,5 @@ test.*
 !.env.vault
 *.ps1
 *.pdf
+*.backup
+Dockerfile.*

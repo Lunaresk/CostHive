@@ -6,7 +6,7 @@ from models.user import User
 from src.utils.routes_utils import render_custom_template as render_template
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_user, logout_user
-from werkzeug.urls import url_parse
+from urllib.parse import urlparse
 
 @bp.route('/register', methods=['GET', 'POST'])
 def web_register():
@@ -34,7 +34,7 @@ def web_login():
             return redirect(url_for('auth.web_login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
+        if not next_page or urlparse(next_page).netloc != '':
             next_page = url_for('main.index')
         return redirect(next_page)
     return render_template('auth/login.html', title='Sign In', form=form)

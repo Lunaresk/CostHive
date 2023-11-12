@@ -11,5 +11,7 @@
         {% endfor %}
     </tbody>
 </table>
+{% with pagination_object=establishment_candidates %}
 {% include "utils/general/_page_navigation.html" %}
+{% endwith %}
 {% endblock %}

@@ -1,4 +1,4 @@
-from flask import abort, request, url_for
+from flask import abort, redirect, request, url_for
 from flask_login import current_user, login_required
 from os import rename
 from werkzeug.utils import secure_filename
@@ -11,10 +11,6 @@ from src.utils.pdf_receipt_parser import PDFReceipt
 from src.utils.routes_utils import render_custom_template as render_template
 
 PDFDir = "./"
-# TODO überarbeiten. PDFs müssen in der Datenbank eine eigene ID bekommen.
-#   Quittungen haben eine gesonderte ID. Die muss als Unique Key in der Datenbank
-#   hinterlegt sein.
-#   Die laufende ID ist zum abspeichern der PDFs gedacht.
 @bp.route('/<int:establishment>', methods=['GET', 'POST'])
 @login_required
 def upload_receipt(establishment: int):
@@ -34,7 +30,8 @@ def upload_receipt(establishment: int):
             db.session.add(dbReceipt)
             db.session.commit()
             rename(f"{PDFDir}/temp.pdf", f"{PDFDir}{secure_filename(f'{dbReceipt.id}.pdf')}")
-            return receipt.text.replace("\n", "<br>")
+            LOGGER.debug(receipt.text)
+            return redirect(url_for("receipts.check_items.confirm_receipt_items", receipt_id = dbReceipt.id))
         else:
             LOGGER.debug(form.errors)
         return render_template("receipts/upload.html", form = form)

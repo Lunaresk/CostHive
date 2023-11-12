@@ -22,6 +22,7 @@ pymupdf = "*"
 requests = "*"
 sqlalchemy-utils = "*"
 wtforms-sqlalchemy = "*"
+pytest = "*"
 
 [dev-packages]
 
