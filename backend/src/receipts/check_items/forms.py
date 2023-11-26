@@ -1,8 +1,8 @@
 from collections import namedtuple
 from flask_wtf import FlaskForm
 from src.utils.models.query_factories import all_brands, all_items
-from wtforms import BooleanField, HiddenField, FieldList, Form, FormField, IntegerField, RadioField, StringField, SubmitField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms import BooleanField, DecimalField, HiddenField, FieldList, Form, FormField, IntegerField, RadioField, StringField, SubmitField
+from wtforms.validators import DataRequired, Optional, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 
@@ -21,11 +21,12 @@ def get_choices():
 class CheckItemsEntryForm(Form):
     itemname = HiddenField('itemname', validators=[DataRequired()])
     price = HiddenField('price', validators=[DataRequired()])
+    amount = HiddenField('amount', validators=[DataRequired()])
     requesting = BooleanField("", default=False,
-                              render_kw={"class": "form-check-input"})
+                              render_kw={"class": "form-check-input form-requesting"})
     new_or_existing = RadioField("",
                                  choices=get_choices(),
-                                 render_kw={"class": "form-check form-check-inline form-check-input"},
+                                 render_kw={"class": "form-check form-check-inline form-check-input form-new_or_existing"},
                                  coerce=int, default=3)
     # Fields for new Item
     new_ean = IntegerField("EAN ID", render_kw={
@@ -51,19 +52,25 @@ class CheckItemsEntryForm(Form):
                 "Please choose if it's a new or existing Item.")
 
 
+class CheckCustomItemsEntryForm(Form):
+    itemname = StringField('Item name', render_kw={"class": "form-control"})
+    price = DecimalField('Price (€)', render_kw={"class": "form-control"})
+    amount = IntegerField('Amount', render_kw={"class": "form-control"}, validators=[Optional()])
+
 class CheckItemsForm(FlaskForm):
     items = FieldList(FormField(CheckItemsEntryForm))
+    custom_items = FieldList(FormField(CheckCustomItemsEntryForm))
     submit = SubmitField("Submit", render_kw={"class": "btn btn-primary mt-3"})
 
     @classmethod
     def new(cls, itemarray):
         CheckItemsEntry = namedtuple(
-            "CheckItemsEntry", ["itemname", "price", "new_brand"])
+            "CheckItemsEntry", ["itemname", "price", "amount", "new_brand"])
         CheckItems = namedtuple("CheckItems", ["items"])
         check_items_entry = []
         for item in itemarray:
             check_items_entry.append(CheckItemsEntry(
-                item['itemname'], item['price'], 0))
+                item['itemname'], item['price'], item['amount'] if 'amount' in item else 1, 0))
         check_items = CheckItems(check_items_entry)
         form = cls(obj=check_items)
 

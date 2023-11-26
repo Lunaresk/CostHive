@@ -2,11 +2,11 @@ from datetime import date
 from flask import abort, request, url_for
 from flask_login import current_user, login_required
 from . import bp
-from .forms import CheckItemsEntryForm, CheckItemsForm, get_choices
+from .forms import CheckCustomItemsEntryForm, CheckItemsEntryForm, CheckItemsForm, get_choices
 from .utils import insert_existing_item, insert_new_item, insert_item_to_receipt, clear_receipt_items
 from src import db, LOGGER
 from models import AmountChange, Item, LoginToken, PriceChange, Receipt, ReceiptItem
-from src.utils.pdf_receipt_parser import PDFReceipt
+from src.utils.modules.receipt_parser.pdf_receipt_parser import PDFReceipt
 from src.utils.routes_utils import render_custom_template as render_template
 
 PDFDir = "./"
@@ -20,6 +20,7 @@ def confirm_receipt_items(receipt_id: int):
     if current_user.is_authenticated and current_user.id == receipt_details.LoginToken.Establishment.owner:
         receipt: PDFReceipt = PDFReceipt.getPDFReceiptFromFile(PDFDir + f"{receipt_details.id}.pdf")
         form: CheckItemsForm = CheckItemsForm.new(receipt.items)
+        _template = CheckCustomItemsEntryForm(prefix="custom_items-_-")
         # TODO: Precheck if items are already in database. If yes, check if item is present only once or multiple
         #       times and provide dropdown menu if necessary. If not, provide input field.
         # temp_choices = []
@@ -58,7 +59,15 @@ def confirm_receipt_items(receipt_id: int):
                     else:
                         LOGGER.debug("Cold catched")
                         abort(400)
-            LOGGER.debug("At this point form.items.data will be returned")
-            # return form.items.data
-        return render_template("receipts/check_items.html", form=form)
+            for itempos, formcustomitem in enumerate(form.custom_items):
+                formcustomitemdata = formcustomitem.data
+                custom_item_dict = {}
+                custom_item_dict['amount'] = formcustomitemdata.get('amount', 1)
+                custom_item_dict['price'] = formcustomitemdata.get('price')
+                custom_item_dict['itemname'] = formcustomitemdata.get('itemname')
+                LOGGER.debug(formcustomitem)
+                LOGGER.debug(custom_item_dict)
+                insert_item_to_receipt(receipt=receipt_details, item_dict=custom_item_dict, item_index=len(form.items)+itempos)
+                LOGGER.debug("Iterating through form custom items")
+        return render_template("receipts/check_items.html", form=form, _template=_template)
     abort(403)

@@ -8,6 +8,7 @@ class LoginToken(db.Model):
         'establishment.id'), primary_key=True, server_onupdate=db.FetchedValue())
     token = db.Column(db.String(15), nullable=False, unique=True)
 
+    LoginTokenDates = db.relationship("LoginTokenDates", backref='LoginToken', lazy='dynamic')
     Payment = db.relationship("Payment", backref='LoginToken', lazy='dynamic')
     Receipt = db.relationship("Receipt", backref='LoginToken', lazy='dynamic')
 

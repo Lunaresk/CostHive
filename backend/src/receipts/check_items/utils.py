@@ -35,7 +35,7 @@ def insert_existing_item(formitemdict: dict[str: str], receipt_date: date = None
         db.session.commit()
 
 def insert_item_to_receipt(receipt: Receipt, item_dict: dict[str: str], item_index:int=0):
-    receipt.ReceiptItem.append(ReceiptItem(item=item_index, amount=item_dict.get('amount'), price=int(item_dict.get('price').replace(',',''))))
+    receipt.ReceiptItem.append(ReceiptItem(item=item_index, name=item_dict.get('itemname'), amount=item_dict.get('amount'), price=int(str(item_dict.get('price')).replace(',','').replace('.', ''))))
     db.session.add(receipt)
     db.session.commit()
 

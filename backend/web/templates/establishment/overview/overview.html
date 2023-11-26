@@ -13,7 +13,7 @@
 <div class="card">
     <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#b{{ user.id }}" aria-expanded="true">
         <div class="card-header">
-            <h3>{{ user.email }}: {{ user.sum/100 }} €</h3>
+            <h3>{{ user.email }}: {{ (user.sum | int)/100 }} €</h3>
         </div>
     </button>
     {% if user.id %}

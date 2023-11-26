@@ -7,7 +7,7 @@ from .forms import UploadReceiptForm
 from src import db, LOGGER
 from models.receipt import Receipt
 from models.login_token import LoginToken
-from src.utils.pdf_receipt_parser import PDFReceipt
+from src.utils.modules.receipt_parser.pdf_receipt_parser import PDFReceipt
 from src.utils.routes_utils import render_custom_template as render_template
 
 PDFDir = "./"

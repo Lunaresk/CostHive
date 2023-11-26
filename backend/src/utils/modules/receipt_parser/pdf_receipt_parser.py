@@ -1,5 +1,5 @@
 import fitz
-from datetime import datetime
+from datetime import datetime, date
 from re import search
 
 class PDFReceipt:
@@ -11,8 +11,14 @@ class PDFReceipt:
         Currently supported: 'edeka'
     """
     def __init__(self, bPDFFile, parser: str = "edeka") -> None:
-        self.text = PDFReceipt._getTextFromPDF(bPDFFile)
-        self.id, self.date, self.items = PDFReceipt._getInfosFromText(self.text, parser)
+        try:
+            self.text = PDFReceipt._getTextFromPDF(bPDFFile)
+            self.id, self.date, self.items = PDFReceipt._getInfosFromText(self.text, parser)
+        except:
+            self.text = "PDF konnte nicht geladen werden."
+            self.date = date.today()
+            self.id = None
+            self.items = []
 
     def _getTextFromPDF(file):
         with fitz.open(file, filetype="pdf") as doc:

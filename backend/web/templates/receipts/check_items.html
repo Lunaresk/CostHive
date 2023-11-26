@@ -5,70 +5,55 @@
 {% block app_content %}
 <form action="" method="post" novalidate enctype="multipart/form-data">
     {{ form.hidden_tag() }}
-    {% for item in form.items %}
-    <h4>{{ item.requesting() }} {{ item.data.itemname }} (€{{ item.data.price }})</h4>
-    {{ render_field(item.itemname) }}
-    {{ render_field(item.price) }}
-    <div class="{{ item.new_or_existing.id }}" style="display: none;">
-    {{ render_field(item.new_or_existing) }}
+    <div id="items-container">
+        {% for item in form.items %}
+        <div id="{{ item.id }}" class="form-item" data-index="{{ loop.index-1 }}">
+            <h4>{{ item.requesting() }} {{ item.data.itemname }} (€{{ item.data.price }})</h4>
+            {{ render_field(item.itemname) }}
+            {{ render_field(item.price) }}
+            <div id="{{ item.new_or_existing.id }}" class="new_or_existing-subform" style="display: none;">
+                {{ render_field(item.new_or_existing) }}
+            </div>
+            <div id="{{ item.id }}_new" class="new-subform" style="display: none;">
+                {{ render_field(item.new_ean) }}
+                {{ render_field(item.new_description) }}
+                {{ render_field(item.new_amount_change) }}
+                {{ render_field(item.new_brand) }}
+            </div>
+            <div id="{{ item.id }}_existing" class="existing-subform" style="display: none;">
+                {{ render_field(item.existing_item) }}
+            </div>
+        </div>
+        <br>
+        {% endfor %}
     </div>
-    <div class="{{ item.id }}_new" style="display: none;">
-        {{ render_field(item.new_ean) }}
-        {{ render_field(item.new_description) }}
-        {{ render_field(item.new_amount_change) }}
-        {{ render_field(item.new_brand) }}
+    <div id="custom_items-container">
+        {% for item in form.custom_items %}
+        <div id="{{ item.id }}" class="form-custom_item" data-index="{{ loop.index-1 }}">
+            {{ render_field(item.itemname) }}
+            {{ render_field(item.price) }}
+            {{ render_field(item.amount) }}
+        </div>
+        <br>
+        {% endfor %}
     </div>
-    <div class="{{ item.id }}_existing" style="display: none;">
-        {{ render_field(item.existing_item) }}
-    </div>
-
+    <button type="button" id="append" class="btn btn-success">Append</button>
     <br>
-    {% endfor %}
     {{ form.submit() }}
 </form>
+<div id="custom_items-_" class="custom_items-template" data-index="_"
+    style="display: none">
+    {{ render_field(_template.itemname) }}
+    {{ render_field(_template.price) }}
+    {{ render_field(_template.amount) }}
+    <br>
+    <button type="button" class="btn btn-danger remove-custom_item">Remove</button>
+    <br>
+</div>
 {% endblock %}
 
 
 {% block scripts %}
-    {{ super() }}
-    {% for item in form.items %}
-    <script>
-        $(document).ready(function () {
-            $("#{{ item.requesting.id }}").change(function () {
-                if ($(this).prop("checked")) {
-                    $(".{{ item.new_or_existing.id }}").show();
-                    if ($("#{{ item.new_or_existing.id }}-1").prop("checked")) {
-                        $(".{{ item.id }}_new").show();
-                    }
-                    if ($("#{{ item.new_or_existing.id }}-2").prop("checked")) {
-                        $(".{{ item.id }}_existing").show();
-                    }
-                }
-                else {
-                    $(".{{ item.new_or_existing.id }}").hide();
-                    $(".{{ item.id }}_new").hide();
-                    $(".{{ item.id }}_existing").hide();
-                }
-            });
-            $("#{{ item.new_or_existing.id }}-1").change(function () {
-                if ($(this).prop("checked")) {
-                    $(".{{ item.id }}_new").show();
-                    $(".{{ item.id }}_existing").hide();
-                }
-            });
-            $("#{{ item.new_or_existing.id }}-2").change(function () {
-                if ($(this).prop("checked")) {
-                    $(".{{ item.id }}_new").hide();
-                    $(".{{ item.id }}_existing").show();
-                }
-            });
-            $("#{{ item.new_or_existing.id }}-3").change(function () {
-                if ($(this).prop("checked")) {
-                    $(".{{ item.id }}_new").hide();
-                    $(".{{ item.id }}_existing").hide();
-                }
-            });
-        });
-    </script>
-    {% endfor %}
+{{ super() }}
+<script src="{{ url_for('static', filename='receipts/check_items.js') }}"></script>
 {% endblock %}
