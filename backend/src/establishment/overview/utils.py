@@ -56,6 +56,7 @@ def group_results(results: tuple) -> list:
     return result_list
 
 def sum_entries(grouped_result_list, login_token_dates):
+    LOGGER.debug("Preparing dict")
     dict_people_modifier = {}
     # dict_people_modifier:
     # {datetime.date(x,y,z): {
@@ -64,14 +65,22 @@ def sum_entries(grouped_result_list, login_token_dates):
     #  }
     # }
     for tokendate in login_token_dates:
-        dict_people_modifier[tokendate.activation_date] = dict_people_modifier.get(tokendate.activation_date, {"add":[]})
+        if not tokendate.activation_date in dict_people_modifier:
+            dict_people_modifier[tokendate.activation_date] = {}
+        if not "add" in dict_people_modifier[tokendate.activation_date]:
+            dict_people_modifier[tokendate.activation_date]['add'] = []
         dict_people_modifier[tokendate.activation_date]["add"].append(tokendate.token)
         if tokendate.deactivation_date != None:
-            dict_people_modifier[tokendate.deactivation_date] = dict_people_modifier.get(tokendate.deactivation_date, {"remove":[]})
-            dict_people_modifier[tokendate.deactivation_date]["remove"].append(tokendate.token)
+            if not tokendate.deactivation_date in dict_people_modifier:
+                if not tokendate.deactivation_date in dict_people_modifier:
+                    dict_people_modifier[tokendate.deactivation_date] = {}
+                if not "remove" in dict_people_modifier[tokendate.deactivation_date]:
+                    dict_people_modifier[tokendate.deactivation_date]['remove'] = []
+                dict_people_modifier[tokendate.deactivation_date]["remove"].append(tokendate.token)
     list_people_amount_per_date = [{"date": key, "people": value} for key, value in dict_people_modifier.items()]
     list_people_amount_per_date.sort(key=lambda x: x.get('date'))
     list_people_per_date = []
+    LOGGER.debug("Preparing list")
     for i in range(len(list_people_amount_per_date)):
         list_people_per_date.append({'date': list_people_amount_per_date[i].get('date'), 'sum': 0})
         if i == 0:
@@ -86,13 +95,13 @@ def sum_entries(grouped_result_list, login_token_dates):
                         list_people_per_date[-1]['people'].remove(person)
                     except ValueError as e:
                         LOGGER.debug(f'{person} not in list.')
+    LOGGER.debug("This is line 91")
     for result_user in grouped_result_list:
         relevant_date_index = 0
         if result_user.get('id'):
             for result_date in result_user['item_infos']:
                 # TODO get relevant date index
                 for i in range(relevant_date_index + 1, len(list_people_per_date)):
-
                     if list_people_per_date[i].get('date') > result_date.get('date'):
                         LOGGER.debug(f"{list_people_per_date[i].get('date')} > {result_date.get('date')}")
                         relevant_date_index = i-1
