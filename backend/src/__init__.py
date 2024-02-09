@@ -34,7 +34,7 @@ login = LoginManager()
 login.login_view = 'auth.web_login'
 ma = Marshmallow()
 mail = Mail()
-migrate = Migrate()
+migrate = Migrate(transaction_per_migration=True)
 
 
 def create_app(config_class=Config):

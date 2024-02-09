@@ -354,3 +354,4 @@ tests*
 *.pdf
 *.backup
 Dockerfile.*
+docker-compose.*

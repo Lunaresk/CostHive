@@ -2,7 +2,7 @@ from flask import abort,  request
 from flask.json import jsonify
 from flask_login import current_user, login_required
 from . import bp
-from .utils import get_report, group_results, sum_entries
+from .utils import calculate_payments, get_report, group_results, sum_entries
 from src import LOGGER
 from models import Establishment, LoginToken
 from src.utils.routes_utils import render_custom_template as render_template
@@ -25,7 +25,7 @@ def get_report_from_user(establishment_id):
     LOGGER.info("Getting results.")
     results = get_report(**request.args, **{"establishment": establishment_id})
     LOGGER.debug(f"Results received.")
-    LOGGER.debug(str(results))
+    # LOGGER.debug(str(results))
     if results:
         result_list = group_results(results)
         tokens = establishment.LoginToken.all()
@@ -33,6 +33,7 @@ def get_report_from_user(establishment_id):
         for token in tokens:
             token_dates.extend(token.LoginTokenDates.all())
         sum_entries(result_list, token_dates)
+        calculate_payments(result_list)
     else:
         result_list = []
     # LOGGER.debug(result_list)
