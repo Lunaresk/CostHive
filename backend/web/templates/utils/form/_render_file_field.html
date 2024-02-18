@@ -1,0 +1,7 @@
+{% macro render_field(field) %}
+<div class="form-group">
+  File upload<br>
+  {{ field(**kwargs)|safe }}
+  {% include "utils/form/_render_field_errors.html" %}
+</div>
+{% endmacro %}

@@ -1,10 +1,13 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
+{% from 'utils/form/_render_field.html' import render_field %}
 
 {% block app_content %}
     <form action="" method="post" novalidate enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        {{ wtf.form_field(form.pdfReceipt, class=form.pdfReceipt.render_kw["class"] or "form-control") }}
-        {{ wtf.form_field(form.submit, class=form.submit.render_kw["class"] or "btn btn-primary mt-3") }}
+        {{ render_field(form.hidden_tag) }}
+        {{ render_field(form.user) }}
+        {{ render_field(form.date) }}
+        {{ render_field(form.pdfReceipt) }}
+        {{ render_field(form.submit) }}
     </form>
 {% endblock %}

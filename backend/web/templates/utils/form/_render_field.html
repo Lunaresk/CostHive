@@ -1,12 +1,18 @@
 {% from 'utils/form/_render_radio_button.html' import render_field as render_radio   %}
 {% from 'utils/form/_render_generic_field.html' import render_field as render_generic   %}
 {% from 'utils/form/_render_hidden_field.html' import render_field as render_hidden   %}
+{% from 'utils/form/_render_submit_field.html' import render_field as render_submit   %}
+{% from 'utils/form/_render_file_field.html' import render_field as render_file   %}
 
 {% macro render_field(field) %}
 {% if field.__class__.__name__ == "RadioField" %}
 {{ render_radio(field) }}
 {% elif field.__class__.__name__ == "HiddenField" %}
 {{ render_hidden(field) }}
+{% elif field.__class__.__name__ == "SubmitField" %}
+{{ render_submit(field) }}
+{% elif field.__class__.__name__ == "FileField" %}
+{{ render_file(field) }}
 {% else %}
 {{ render_generic(field)}}
 {% endif %}

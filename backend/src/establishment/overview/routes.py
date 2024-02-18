@@ -38,6 +38,7 @@ def get_report_from_user(establishment_id):
         result_list = []
     # LOGGER.debug(result_list)
     if request.content_type == "application/json":
+        LOGGER.debug("Returning JSON")
         return jsonify(result_list)
     else:
         return render_template("establishment/overview/overview.html", results=result_list, establishment=Establishment.query.get(int(establishment_id)))

@@ -1,6 +1,7 @@
 from datetime import date
 from flask import render_template
 from flask_login import current_user
+from src import LOGGER
 
 
 def get_base_infos():
@@ -15,4 +16,5 @@ def get_base_infos():
     return infos
 
 def render_custom_template(*args, **kwargs):
+    LOGGER.debug("Rendering template")
     return render_template(*args, **kwargs, **get_base_infos())

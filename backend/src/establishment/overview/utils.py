@@ -138,9 +138,11 @@ def sum_entries(grouped_result_list, login_token_dates):
                 result_user['sum'] -= entry_people_per_date.get('sum')/len(entry_people_per_date.get('people'))
 
 def calculate_payments(grouped_result_list):
+    LOGGER.debug("Calculating Payments")
     for result_user in grouped_result_list:
-        payments:list[Payment] = Payment.query.filter_by(token=result_user.get('id')).all()
+        payments:list[Payment] = Payment.query.filter_by(token=result_user.get('id')).order_by(Payment.date).all()
         if payments:
+            LOGGER.debug(f"Payments found for user {result_user.get('id')}")
             result_user['payments'] = [{"date": x.date, "amount": x.amount} for x in payments]
             paymentsum = sum([x.amount for x in payments])
             LOGGER.debug(f"Adding payments of a total of {paymentsum} to {result_user.get('id')}")

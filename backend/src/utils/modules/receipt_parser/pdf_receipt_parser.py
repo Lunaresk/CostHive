@@ -56,5 +56,8 @@ class PDFReceipt:
         return (intReceiptNumber, date, items)
 
     def getPDFReceiptFromFile(strPDFFile: str, parser: str = "edeka"):
-        with open(strPDFFile) as doc:
-            return PDFReceipt(doc, parser)
+        try:
+            with open(strPDFFile) as doc:
+                return PDFReceipt(doc, parser)
+        except FileNotFoundError as e:
+            return PDFReceipt(None)
