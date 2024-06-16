@@ -1,7 +1,7 @@
 """new table for bought entries with unknown items 2
 
 Revision ID: 2a64d3b9235a
-Revises: 24b8e319c0d0
+Revises: 015f4256bb4c
 Create Date: 2024-06-02 13:19:59.901053
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '2a64d3b9235a'
-down_revision = '24b8e319c0d0'
+down_revision = '015f4256bb4c'
 branch_labels = None
 depends_on = None
 
