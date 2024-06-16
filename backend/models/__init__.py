@@ -3,6 +3,7 @@ from .receipt_item import ReceiptItem
 from .receipt import Receipt
 from .login_token import LoginToken
 from .bought import Bought
+from .bought_with_unknown_item import BoughtWithUnknownItem
 from .establishment import Establishment
 from .establishment_candidate import EstablishmentCandidate
 from .user import User
