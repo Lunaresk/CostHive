@@ -17,7 +17,7 @@ def insert_payment(establishment_id: int):
     if form.validate_on_submit():
         new_payment = Payment(token = form.token.data,
                           date = form.date.data,
-                          amount = form.amount.data)
+                          amount = int(form.amount.data*100))
         db.session.add(new_payment)
         db.session.commit()
         return redirect(url_for("main.index"))

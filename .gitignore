@@ -355,3 +355,4 @@ tests*
 *.backup
 Dockerfile.*
 docker-compose.*
+*debug.py

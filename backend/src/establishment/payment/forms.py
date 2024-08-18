@@ -1,12 +1,12 @@
 from models import LoginToken
 from flask_wtf import FlaskForm
-from wtforms import DateField, FloatField, IntegerField, SelectField, SelectMultipleField, StringField, SubmitField
-from wtforms.validators import DataRequired, Optional
+from wtforms import DateField, DecimalField, SelectField, SubmitField
+from wtforms.validators import DataRequired
 
 class NewPaymentForm(FlaskForm):
     token = SelectField("User", validators=[DataRequired()], render_kw={"class": "form-control"})
     date = DateField("Date", validators=[DataRequired()], render_kw={"class": "form-control"})
-    amount = IntegerField("Amount (in ct)", validators=[DataRequired()], render_kw={"class": "form-control"})
+    amount = DecimalField("Amount (€)", validators=[DataRequired()], render_kw={"class": "form-control"})
     submit = SubmitField("Submit", render_kw={"class": "btn btn-primary mt-3"})
 
     @classmethod
