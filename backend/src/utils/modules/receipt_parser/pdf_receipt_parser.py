@@ -1,5 +1,7 @@
 import fitz
 from datetime import datetime, date
+from .edeka.edeka_parser import getDictFromWords as edekaparser
+from .kaufland.kaufland_parser import getDictFromWords as kauflandparser
 from re import search
 
 class PDFReceipt:
@@ -10,22 +12,29 @@ class PDFReceipt:
     parser -- A keyword in lowercase to tell how the receipt is formated.
         Currently supported: 'edeka'
     """
-    def __init__(self, bPDFFile, parser: str = "edeka") -> None:
+    def __init__(self, strPDFFile) -> None:
         try:
-            self.text = PDFReceipt._getTextFromPDF(bPDFFile)
-            self.id, self.date, self.items = PDFReceipt._getInfosFromText(self.text, parser)
+            self.words = PDFReceipt._getWordsFromPDF(strPDFFile)
+            storename = PDFReceipt._getStoreName(self.words)
+            self.id, self.date, self.items = PDFReceipt._getInfosFromText(self.words, store = storename)
         except:
-            self.text = "PDF konnte nicht geladen werden."
+            self.words = "PDF konnte nicht geladen werden."
             self.date = date.today()
             self.id = None
             self.items = []
 
-    def _getTextFromPDF(file):
+    def _getWordsFromPDF(file):
         with fitz.open(file, filetype="pdf") as doc:
-            text = ""
+            words = []
             for page in doc:
-                text += page.get_text()
-        return text.strip()
+                words.extend(page.get_text("words", textpage=page.get_textpage_ocr(), sort=True))
+        return words
+    
+    def _getStoreName(words: list[tuple]) -> str:
+        for word in words:
+            if word[4].lower() in ("edeka", "kaufland"):
+                return word[4].lower()
+        return "unknown"
 
     def _getItemsTextFromText(text, start="", end=""):
         return text[text.index(start)+len(start):text.index(end)].strip()
@@ -43,21 +52,23 @@ class PDFReceipt:
                 i += 2
         return resultsArr
 
-    def _getInfosFromText(text: str, parser: str = "edeka"):
-        if parser.lower() == "edeka":
-            items = PDFReceipt._convertItemsTextToDict(PDFReceipt._getItemsTextFromText(text, start="EUR", end="----------"))
-            strDate = text.split("\n")[-1].split(" ")[0]
-            date = datetime.strptime(strDate, "%d.%m.%y").date()
-            strReceiptNumber = text.split("\n")[-1].split(" ")[-1]
-            try:
-                intReceiptNumber = int(strReceiptNumber)
-            except:
-                raise ValueError("Receipt Number not an integer.")
+    def _getInfosFromText(words: str, store: str = "edeka"):
+        if store == "edeka":
+            result = edekaparser(words)
+        elif store == "kaufland":
+            result = kauflandparser(words)
+        items = result.get("items")
+        date = result.get("date")
+        strReceiptNumber = result.get("bonid")
+        try:
+            intReceiptNumber = int(strReceiptNumber)
+        except:
+            raise ValueError("Receipt Number not an integer.")
         return (intReceiptNumber, date, items)
 
-    def getPDFReceiptFromFile(strPDFFile: str, parser: str = "edeka"):
+    def getPDFReceiptFromFile(strPDFFile: str):
         try:
             with open(strPDFFile) as doc:
-                return PDFReceipt(doc, parser)
+                return PDFReceipt(doc)
         except FileNotFoundError as e:
             return PDFReceipt(None)

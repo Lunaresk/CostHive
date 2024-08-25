@@ -40,7 +40,7 @@ def upload_receipt(establishment: int):
             db.session.commit()
             if pdfReceipt:
                 rename(f"{PDFDir}/temp.pdf", f"{PDFDir}{secure_filename(f'{dbReceipt.id}.pdf')}")
-                LOGGER.debug(receipt.text)
+                LOGGER.debug(receipt.words)
             return redirect(url_for("receipts.check_items.confirm_receipt_items", receipt_id = dbReceipt.id))
         else:
             LOGGER.debug(form.errors)
