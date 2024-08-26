@@ -1,5 +1,5 @@
 import fitz
-from datetime import datetime, date
+from datetime import date
 from .edeka.edeka_parser import getDictFromWords as edekaparser
 from .kaufland.kaufland_parser import getDictFromWords as kauflandparser
 from re import search
@@ -35,22 +35,6 @@ class PDFReceipt:
             if word[4].lower() in ("edeka", "kaufland"):
                 return word[4].lower()
         return "unknown"
-
-    def _getItemsTextFromText(text, start="", end=""):
-        return text[text.index(start)+len(start):text.index(end)].strip()
-
-    def _convertItemsTextToDict(text):
-        temp = text.split("\n")
-        resultsArr = []
-        i = 0
-        while i < len(temp):
-            if search("(\d+) x", temp[i]):
-                resultsArr.append({"itemname": temp[i+2], "price": temp[i+1], "amount": temp[i][:-2]})
-                i += 4
-            else:
-                resultsArr.append({"itemname": temp[i], "price": temp[i+1][:-2]})
-                i += 2
-        return resultsArr
 
     def _getInfosFromText(words: str, store: str = "edeka"):
         if store == "edeka":

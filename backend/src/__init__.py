@@ -38,6 +38,8 @@ migrate = Migrate(transaction_per_migration=True)
 
 
 def create_app(config_class=Config):
+    if not exists(config_class.RECEIPT_FOLDER):
+        makedirs(config_class.RECEIPT_FOLDER)
     app = Flask(__name__, template_folder="../web/templates", static_folder="../web/static")
     app.config.from_object(config_class)
     bootstrap.init_app(app)

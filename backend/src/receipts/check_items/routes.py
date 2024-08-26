@@ -1,5 +1,5 @@
 from datetime import date
-from flask import abort, request, url_for
+from flask import abort, current_app, request, url_for
 from flask_login import current_user, login_required
 from . import bp
 from .forms import CheckCustomItemsEntryForm, CheckItemsEntryForm, CheckItemsForm, get_choices
@@ -9,16 +9,16 @@ from models import AmountChange, Item, LoginToken, PriceChange, Receipt, Receipt
 from src.utils.modules.receipt_parser.pdf_receipt_parser import PDFReceipt
 from src.utils.routes_utils import render_custom_template as render_template
 
-PDFDir = "./"
 
 @bp.route('/<int:receipt_id>', methods=['GET', 'POST'])
 @login_required
 def confirm_receipt_items(receipt_id: int):
     """Check items from a receipt if they should be accounted for payment.
     Get those items from the receipt PDF itself."""
+    PDFDir: str = current_app.config["RECEIPT_FOLDER"]
     receipt_details: Receipt = Receipt.query.get(receipt_id)
     if current_user.is_authenticated and current_user.id == receipt_details.LoginToken.Establishment.owner:
-        receipt: PDFReceipt = PDFReceipt.getPDFReceiptFromFile(PDFDir + f"{receipt_details.id}.pdf")
+        receipt: PDFReceipt = PDFReceipt.getPDFReceiptFromFile(PDFDir + f"/{receipt_details.id}.pdf")
         form: CheckItemsForm = CheckItemsForm.new(receipt.items)
         _template = CheckCustomItemsEntryForm(prefix="custom_items-_-")
         # TODO: Precheck if items are already in database. If yes, check if item is present only once or multiple

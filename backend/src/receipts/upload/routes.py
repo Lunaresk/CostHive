@@ -1,4 +1,4 @@
-from flask import abort, redirect, request, url_for
+from flask import abort, current_app, redirect, request, url_for
 from flask_login import current_user, login_required
 from os import rename
 from werkzeug.utils import secure_filename
@@ -10,11 +10,11 @@ from models.login_token import LoginToken
 from src.utils.modules.receipt_parser.pdf_receipt_parser import PDFReceipt
 from src.utils.routes_utils import render_custom_template as render_template
 
-PDFDir = "./"
 @bp.route('/<int:establishment>', methods=['GET', 'POST'])
 @login_required
 def upload_receipt(establishment: int):
     """Upload of a receipt."""
+    PDFDir: str = current_app.config["RECEIPT_FOLDER"]
     if current_user.is_anonymous:
         abort(403)
     if LoginToken.query.filter_by(establishment=establishment, user=current_user.id).first():
@@ -39,7 +39,7 @@ def upload_receipt(establishment: int):
             db.session.add(dbReceipt)
             db.session.commit()
             if pdfReceipt:
-                rename(f"{PDFDir}/temp.pdf", f"{PDFDir}{secure_filename(f'{dbReceipt.id}.pdf')}")
+                rename(f"{PDFDir}/temp.pdf", f"{PDFDir}/{secure_filename(f'{dbReceipt.id}.pdf')}")
                 LOGGER.debug(receipt.words)
             return redirect(url_for("receipts.check_items.confirm_receipt_items", receipt_id = dbReceipt.id))
         else:

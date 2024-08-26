@@ -10,5 +10,4 @@ def show_item(item: int):
     itemschema = ItemSchema().dump(itemobj)
     itemschema['PriceChange'].sort(key=lambda d: d['date'], reverse=True)
     itemschema['AmountChange'].sort(key=lambda d: d['date'], reverse=True)
-    print(itemschema)
     return render_template('item/details/show_item.html', item = itemschema)

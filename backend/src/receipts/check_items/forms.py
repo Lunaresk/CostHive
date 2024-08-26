@@ -73,6 +73,4 @@ class CheckItemsForm(FlaskForm):
                 item['itemname'], item['price'], item['amount'] if 'amount' in item else 1, 0))
         check_items = CheckItems(check_items_entry)
         form = cls(obj=check_items)
-
-        print(f"{form.items.entries}")
         return form
